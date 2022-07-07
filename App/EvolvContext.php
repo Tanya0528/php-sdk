@@ -17,9 +17,9 @@ class Context
     public $result;
 
     
-    private string $uid;
-    private array $remoteContext = [];
-    private array $localContext = [];
+    public string $uid;
+    public array $remoteContext = [];
+    public array $localContext = [];
     private bool $initialized = false;
 
     /**

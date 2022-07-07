@@ -188,11 +188,9 @@ class Predicate
 
     public function regex64Match($a, $b)
     {
-
-        $result = decode($a) === true ? true : false;
+        $result = base64_decode($a) === true ? true : false;
 
         return $result;
-
     }
 
     public function valueFromKey($context, $key)
@@ -217,7 +215,7 @@ class Predicate
 
         }
 
-        return valueFromKey(substr($key, 0, $nextToken), substr($key, 0, $nextToken + 1));
+        return $this->valueFromKey(substr($key, 0, $nextToken), substr($key, 0, $nextToken + 1));
     }
 
     public function getKeyFromValeuContext($context)
@@ -251,24 +249,21 @@ class Predicate
     }
 
 
-    public
-    function item($item)
+    public function item($item)
     {
-        return array_push($result['touched'], $item['field']);
+        return array_push($this->result['touched'], $item['field']);
     }
 
     public
     function evaluate($context, $predicate)
     {
-        $result = [
+        $this->result = [
             'passed' => [],
             'failed' => [],
             'touched' => []
         ];
 
-
         $active = $this->evaluatePredicate($context, $predicate);
-
 
         return $active;
     }

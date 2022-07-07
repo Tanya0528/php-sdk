@@ -6,7 +6,7 @@ use App\EvolvClient\EvolvClient;
 require_once __DIR__ . '/../App/EvolvClient.php';
 
 
-class EvolvClientTest extends TestCase {
+class ClientTest extends TestCase {
 
     public function testInitializeMakesTwoRequests() {
         $environment = '758012fca1';

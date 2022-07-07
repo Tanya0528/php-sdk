@@ -11,7 +11,7 @@ class ActiveKeysTest extends TestCase {
 
     public function setUp(): void {
         $environment = '758012fca1';
-        $endpoint = 'https://participants.evolv.ai/v1';
+        $endpoint = 'https://participants.evolv.ai/';
         $uid = 'uid';
 
         $mock = $this->createMock(HttpClient::class);

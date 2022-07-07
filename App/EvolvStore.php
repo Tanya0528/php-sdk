@@ -12,35 +12,42 @@ require_once __DIR__ . '/EvolvPredicate.php';
 
 class Store
 {
-
-    public $version;
-    public $prefix;
-    public $keyId;
-    public $key;
-
-
+    private $httpClient;
+    private bool $initialized = false;
+    private string $environment;
+    private string $endpoint;
+    private $context;
     public $genomeKeyStates = [];
     public $configKeyStates = [];
-    public $context = ' ';
-    public $clientContext = null;
-    public $initialized = false;
-    public $waitingToPull = false;
-    public $waitingToPullImmediate = true;
-    public $genomes = [];
-    public $effectiveGenome = [];
-    public $allocations = null;
-    public $config = null;
-    public $current = [];
 
-    public function pull($environment, $uid, $endpoint)
+    public function __construct(string $environment, string $endpoint)
     {
-        $httpClient = new HttpClient();
+        $this->environment = $environment;
+        $this->endpoint = $endpoint;
 
-        $allocationUrl = $endpoint . '/' . $environment . '/' . $uid . '/allocations';
-        $configUrl = $endpoint . '/' . $environment . '/' . $uid . '/configuration.json';
+        $this->httpClient = new HttpClient();
+    }
 
-        $arr_location = $httpClient->request($allocationUrl);
-        $arr_config = $httpClient->request($configUrl);
+    public function initialize($context) {
+        if ($this->initialized) {
+            echo 'Evolv: The store has already been initialized.';
+        }
+
+        $this->context = $context;
+        $this->initialized = true;
+
+        $this->pull();
+
+        // TODO: waitFor CONTEXT_CHANGED event
+    }
+
+    private function pull()
+    {
+        $allocationUrl = $this->endpoint . 'v1/' . $this->environment . '/' . $this->context->uid . '/allocations';
+        $configUrl = $this->endpoint . 'v1/' . $this->environment . '/' . $this->context->uid . '/configuration.json';
+
+        $arr_location = $this->httpClient->request($allocationUrl);
+        $arr_config = $this->httpClient->request($configUrl);
 
         $arr_config = json_decode($arr_config, true);
 
@@ -59,92 +66,20 @@ class Store
         array_push($this->genomeKeyStates['experiments'], $arr_config);
 
         foreach ($arr_config['_experiments'] as $key => $v) {
-
             array_push($this->configKeyStates['experiments'], $v);
-
         }
     }
 
     public function getActiveKeys()
     {
-
         $predicate = new Predicate();
 
         $configKeyStates = $this->configKeyStates;
 
-        // $predicates = $predicate->getPredicate($configKeyStates);
-
-        $context = $this->localContext();
+        $context = $this->context->getRemoteContext();
 
         $keys = $predicate->evaluate($context, $configKeyStates);
-        // $keys = $predicate->getPredicate($context, $configKeyStates);
 
         return $keys;
     }
-
-    public function localContext()
-    {
-
-        return Context::locContext();
-
-    }
-
-    public function remoteContext()
-    {
-
-        return Context::remContext();
-
-    }
-
-    public function evaluatePredicates($context, $config)
-    {
-
-        if (empty($config) || count($config) == 0) {
-
-            echo "Config empty!";
-
-            return false;
-
-        }
-
-        $predicate = new Predicate();
-
-        $predicates = $predicate->getPredicate($context, $config);
-
-        $predicate->evaluate($context, $predicates);
-
-    }
-
-
-    public function print_r($arr)
-    {
-        echo "<pre>";
-        print_r($arr);
-        echo "</pre>";
-    }
-
-    public function initialized($context, $uid, $endpoint)
-    {
-
-        if ($this->initialized) {
-
-
-            echo 'Evolv: The store has already been initialized.';
-
-        }
-
-        $context = $this->context;
-
-    }
-
-/*    function createRequestSubscribablePromise($source, $transform, $key)
-    {
-        $resolve = null;
-        $reject = null;
-    }*/
-
 }
-
-
-
-
