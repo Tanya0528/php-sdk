@@ -39,7 +39,7 @@ class ActiveKeysTest extends TestCase {
     */
     public function shouldReturnEmptyWhenRootMatchedButChildPredicatesDoNot() {
         // Arrange
-        $this->client->set('native.newUser', true, true);
+        $this->client->context->set('native.newUser', true, true);
 
         // Act
         $activeKeys = $this->client->getActiveKeys();
@@ -53,8 +53,8 @@ class ActiveKeysTest extends TestCase {
     */
     public function shouldReturnHomeKeysWhenPredicateMached() {
         // Arrange
-        $this->client->set('native.newUser', true, true);
-        $this->client->set('native.pageCategory', 'home', true);
+        $this->client->context->set('native.newUser', true, true);
+        $this->client->context->set('native.pageCategory', 'home', true);
 
         // Act
         $activeKeys = $this->client->getActiveKeys();
@@ -69,8 +69,8 @@ class ActiveKeysTest extends TestCase {
     */
     public function shouldReturnPdpKeysWhenPredicateMached() {
         // Arrange
-        $this->client->set('native.newUser', true, true);
-        $this->client->set('native.pageCategory', 'pdp', true);
+        $this->client->context->set('native.newUser', true, true);
+        $this->client->context->set('native.pageCategory', 'pdp', true);
 
         // Act
         $activeKeys = $this->client->getActiveKeys();
@@ -85,9 +85,9 @@ class ActiveKeysTest extends TestCase {
     */
     public function shouldNotReturnPageLayoutWhenPredicateNotMached() {
         // Arrange
-        $this->client->set('native.newUser', true, true);
-        $this->client->set('native.pageCategory', 'pdp', true);
-        $this->client->set('extra_key', true, true);
+        $this->client->context->set('native.newUser', true, true);
+        $this->client->context->set('native.pageCategory', 'pdp', true);
+        $this->client->context->set('extra_key', true, true);
 
         // Act
         $activeKeys = $this->client->getActiveKeys();

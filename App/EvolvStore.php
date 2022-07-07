@@ -19,6 +19,7 @@ class Store
     private $context;
     public $genomeKeyStates = [];
     public $configKeyStates = [];
+    public $activeEids = [];
 
     public function __construct(string $environment, string $endpoint)
     {
@@ -70,7 +71,7 @@ class Store
         }
     }
 
-    public function getActiveKeys()
+    public function getActiveKeys(string $prefix = '')
     {
         $predicate = new Predicate();
 
@@ -81,5 +82,10 @@ class Store
         $keys = $predicate->evaluate($context, $configKeyStates);
 
         return $keys;
+    }
+
+    public function activeEntryPoints()
+    {
+        return [];
     }
 }

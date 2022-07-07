@@ -11,7 +11,9 @@ function setKeyToValue(string $key, $value, array &$array) {
 
         $setval = ($i === 0) ? $value : $array;
 
-        $array = [$k => $setval];
+        $array = [
+            $k => $setval
+        ];
 
     }
 

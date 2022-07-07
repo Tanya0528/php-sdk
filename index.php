@@ -81,7 +81,7 @@ function display($arr, $title = null)
                         $client->initialize($uid);
 
                         $client->context->set('native.newUser', true);
-                        // $client->context->set('native.pageCategory', 'home');
+                        $client->context->set('native.pageCategory', 'home');
 
                         $activeKeys = $client->getActiveKeys();
 

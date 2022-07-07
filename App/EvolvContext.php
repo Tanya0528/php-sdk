@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\EvolvContext;
 
 use function Utils\setKeyToValue;
+use function Utils\getValueForKey;
 require_once __DIR__ . '/../Utils/setKeyToValue.php';
+require_once __DIR__ . '/../Utils/getValueForKey.php';
 
 class Context
 {
@@ -104,5 +106,47 @@ class Context
         } else {
             setKeyToValue($key, $value, $this->remoteContext);
         }
+    }
+
+    /**
+     * Retrieve a value from the context.
+     *
+     * @param {String} key The kay associated with the value to retrieve.
+     * @returns {*} The value associated with the specified key.
+     */
+    public function get(string $key)
+    {
+        $this->ensureInitialized();
+
+        $value = getValueForKey($key, $this->remoteContext);
+        if (!$value) {
+            $value = getValueForKey($key, $this->localContext);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Remove a specified key from the context.
+     *
+     * Note: This will cause the effective genome to be recomputed.
+     *
+     * @param key {String} The key to remove from the context.
+     */
+    public function remote(string $key)
+    {
+        $this->ensureInitialized();
+    }
+
+    /**
+     * Merge the specified object into the current context.
+     *
+     * Note: This will cause the effective genome to be recomputed.
+     *
+     * @param update {Object} The values to update the context with.
+     * @param local {Boolean} If true, the values will only be added to the localContext.
+     */
+    public function update($update, $local = false) {
+        $this->ensureInitialized();
     }
 }
