@@ -245,8 +245,6 @@ class Predicate
 
                     }
                 }
-
-
             }
         }
         return $cntxt;

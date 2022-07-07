@@ -13,22 +13,21 @@ require_once __DIR__ . '/EvolvStore.php';
 
 ini_set('display_errors', 'on');
 
-class EvolvClient extends Store
+class EvolvClient
 {
     public $initialized = false;
     public $options;
-    public $store;
     public $obj;
-    public $context;
     public $error;
     public $beaconOptions = [];
     public $remoteContext;
     public $localContext;
-
+    
+    public $context;
+    protected $store;
 
     public function setOptions($options)
     {
-
         $this->options = Options::buildOptions($options);
 
         return $this->options;
@@ -68,21 +67,16 @@ class EvolvClient extends Store
 
 
         if ($this->initialized == true) {
-
             echo('Evolv: Client is already initialized');
-
         }
 
         if (!$uid) {
-
             echo 'Evolv: "uid" must be specified';
-
         }
 
         Context::initialize($uid, $remoteContext, $localContext);
 
         $store = new Store();
-
         $store->initialized($this->context, $uid, $endpoint);
 
 
@@ -90,57 +84,17 @@ class EvolvClient extends Store
 
     public function set($key, $value, $local)
     {
-
         $result = Context::set($key, $value, $local);
-
-        $this->remoteContext();
-
-        $this->localContext();
-
     }
 
-    public function localContext(){
-
-        return Context::locContext();
-
-    }
-
-    public function remoteContext(){
-
-        return Context::remContext();
-
-    }
-
-    public function __construct($environment,$uid,$endpoint)
+    public function __construct($environment, $uid, $endpoint)
     {
 
         $this->context = new Context();
-
-        $store = new Store();
-
+        $this->store = new Store();
 
         Context::initialize($uid, $this->remoteContext, $this->localContext);
-
-      //  $this->remoteContext = Context::$remoteContext;
-
-     //  $this->localContext = Context::$localContext;
-
-     //   $this->print_r($this->localContext);
-
-     //   $store->initialized($this->context, $options);
-
-      //  $store->pull($options);
-
-
     }
-
-    public function print_r($arr)
-    {
-        echo "<pre>";
-        print_r($arr);
-        echo "</pre>";
-    }
-
 }
 
 

@@ -4,95 +4,114 @@ declare(strict_types=1);
 
 namespace App\EvolvContext;
 
-use  App\EvolvOptions\Options;
-
-require_once __DIR__ . '/EvolvOptions.php';
-
-
 class Context
 {
+    public $current = [];
+    public $set = [];
+    public $value;
+    public $local;
+    public $context;
+    public $result;
 
-    public $uid;
-    public $sid;
-    public $initialized = false;
-    public static $current = [];
-    public static $set = [];
-    public static $value;
-    public static $local;
-    public static $context;
-    public static $remoteContext;
-    public static $localContext;
-    public static $result;
+    
+    private string $uid;
+    private array $remoteContext = [];
+    private array $localContext = [];
+    private bool $initialized = false;
 
     /**
      * A unique identifier for the participant.
+     *
+     * @return string
      */
-    public function getUid($uid)
+    public function getUid(): string
     {
-        return $this->uid = $uid;
+        return $this->uid;
     }
-
 
     /**
      * The context information for evaluation of predicates and analytics.
+     *
+     * @return array
      */
-    public function remoteContext($remoteContext)
+    public function getRemoteContext(): array
     {
-
-        $this->remoteContext = Options::Parse($remoteContext);
-
+        // TODO: return cloned copy of remoteContext
+        return $this->remoteContext;
     }
 
     /**
      * The context information for evaluation of predicates only, and not used for analytics.
+     *
+     * @return array
      */
-    public function localContext($localContext)
+    public function getLocalContext(): array
     {
-
-        self::$remoteContext = Options::Parse(self::$localContext);
-
+        // TODO: return cloned copy of localContext
+       return $this->remoteContext; 
     }
 
-    public function ensureInitialized()
+    private function ensureInitialized(): void
     {
-
-        if ($this->initialized == false) {
-            echo 'Evolv: The evolv context is not initialized';
-        } else if ($this->initialized == true) {
-            echo "Evolv: The evolv context is initialized";
+        if (!$this->initialized) {
+            throw new \Exception('Evolv: The context is not initialized');
         }
     }
 
-    public static function getValueForKey($key, $local)
+    public function initialize($uid, $remoteContext, $localContext)
     {
+        if ($this->initialized) {
+            throw new \Exception('Evolv: The context is already initialized');
+        }
 
-        self::$value;
-        $local;
+        $this->uid = $uid;
 
-        $keys = explode(".", $key);
+        // TODO: clone the remoteContext passed from args
+        $this->remoteContext = $remoteContext;
 
-        for ($i = 0; $i < count($keys); $i++) {
+        // TODO: clone the localContext passed from args
+        $this->localContext = $localContext;
 
-            $k = $keys[$i];
+        $this->initialized = true;
 
-            if ($i === (count($keys) - 1)) {
+        // TODO: emit CONTEXT_INITIALIZED event
+    }
 
-                self::$current[$k] = self::$value;
+    public function __destruct()
+    {
+        // TODO: emit CONTEXT_DESTROYED event
+    }
 
+    /**
+     * Sets a value in the current context.
+     *
+     * Note: This will cause the effective genome to be recomputed.
+     * 
+     * @param string $key The key to associate the value to.
+     * @param mixed $value The value to associate with the key.
+     * @param bool $local If true, the value will only be added to the localContext.
+     * @return bool True if context value has been changes, otherwise false.
+     */ 
+    public function set(string $key, mixed $value, bool $local = false): void
+    {
+        $this->ensureInitialized();
+
+        $context = $local ? $this->localContext : $this->remoteContext;
+
+        $key;
+        $value;
+
+        switch ($local) {
+            case true:
+                $this->localContext[] = $this->setKeyToValue($key, $value, $local);
                 break;
-
-            } else {
-
-                self::$current[$k] = null;
-
-            }
-
+            case false:
+                $this->remoteContext[] = $this->setKeyToValue($key, $value, $local);
+                break;
         }
-
-        return self::$value;
     }
 
-    public static function setKeyToValue($key, $value, $local)
+    private function setKeyToValue($key, $value)
     {
         $key;
         $value;
@@ -117,7 +136,7 @@ class Context
 
     }
 
-    public static function arraysEqual($a, $b)
+    private function arraysEqual($a, $b)
     {
         if (!is_array($a) || !is_array($b)) return false;
 
@@ -132,70 +151,4 @@ class Context
         }
         return true;
     }
-
-
-    /**
-     * Sets a value in the current context.
-     *
-     * Note: This will cause the effective genome to be recomputed.
-     *
-     * @param key {String} The key to associate the value to.
-     * @param value {*} The value to associate with the key.
-     * @param local {Boolean} If true, the value will only be added to the localContext.
-     */
-
-    public static function set($key, $value, $local)
-    {
-        $key;
-        $value;
-
-
-        switch ($local) {
-
-            case true:
-
-                self::$localContext[] = self::setKeyToValue($key, $value, $local);
-
-                break;
-
-            case false:
-
-                self::$remoteContext[] = self::setKeyToValue($key, $value, $local);
-
-                break;
-
-        }
-
-
-    }
-
-    public static function locContext()
-    {
-
-        return self::$localContext;
-
-    }
-
-    public static function remContext()
-    {
-
-        return self::$remoteContext;
-
-    }
-
-
-    public static function initialize($uid, $remoteContext, $localContext)
-    {
-        $context = new Context();
-
-        if ($context->initialized) {
-
-            echo $error = 'Evolv: The context is already initialized';
-
-        }
-
-        $context->initialized = true;
-    }
-
-
 }
