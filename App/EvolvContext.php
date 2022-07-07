@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\EvolvContext;
 
+use function Utils\setKeyToValue;
+require_once __DIR__ . '/../Utils/setKeyToValue.php';
+
 class Context
 {
     public $current = [];
@@ -48,7 +51,7 @@ class Context
     public function getLocalContext(): array
     {
         // TODO: return cloned copy of localContext
-       return $this->remoteContext; 
+       return $this->localContext; 
     }
 
     private function ensureInitialized(): void
@@ -58,7 +61,7 @@ class Context
         }
     }
 
-    public function initialize($uid, $remoteContext, $localContext)
+    public function initialize($uid, $remoteContext = [], $localContext = [])
     {
         if ($this->initialized) {
             throw new \Exception('Evolv: The context is already initialized');
@@ -92,63 +95,14 @@ class Context
      * @param bool $local If true, the value will only be added to the localContext.
      * @return bool True if context value has been changes, otherwise false.
      */ 
-    public function set(string $key, mixed $value, bool $local = false): void
+    public function set(string $key, $value, bool $local = false): void
     {
         $this->ensureInitialized();
 
-        $context = $local ? $this->localContext : $this->remoteContext;
-
-        $key;
-        $value;
-
-        switch ($local) {
-            case true:
-                $this->localContext[] = $this->setKeyToValue($key, $value, $local);
-                break;
-            case false:
-                $this->remoteContext[] = $this->setKeyToValue($key, $value, $local);
-                break;
+        if ($local) {
+            setKeyToValue($key, $value, $this->localContext);
+        } else {
+            setKeyToValue($key, $value, $this->remoteContext);
         }
-    }
-
-    private function setKeyToValue($key, $value)
-    {
-        $key;
-        $value;
-
-        $array = explode(".", $key);
-
-        $array = array_reverse($array);
-
-        foreach ($array as $key => $val) {
-
-            $setval = ($key === 0) ? $value : self::$result;
-
-            self::$result = [
-
-                $val => $setval
-
-            ];
-
-        }
-
-        return self::$result;
-
-    }
-
-    private function arraysEqual($a, $b)
-    {
-        if (!is_array($a) || !is_array($b)) return false;
-
-        if ($a === $b) return true;
-
-        if (count($a) !== count($b)) return false;
-
-        for ($i = 0; $i < count($a); ++$i) {
-
-            if ($a[$i] !== $b[$i]) return false;
-
-        }
-        return true;
     }
 }
