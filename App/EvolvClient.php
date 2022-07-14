@@ -91,7 +91,7 @@ class EvolvClient
         $contaminations = $this->context->get('experiments.contaminations');
         $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations);
 
-        $confirmableAllocations = array_filter($allocations, function($alloc) {
+        $confirmableAllocations = array_filter($allocations, function($alloc) use ($confirmedCids, $contaminatedCids, $entryPointEids) {
             return !array_search($alloc['cid'], $confirmedCids) &&
                 !array_search($alloc['cid'], $contaminatedCids) &&
                 array_search($alloc['eid'], $this->store->activeEids) &&
@@ -103,7 +103,7 @@ class EvolvClient
 
         $timestamp = time();
 
-        $contextConfirmations = array_map(function($alloc) {
+        $contextConfirmations = array_map(function($alloc) use ($timestamp) {
             return ['cid' => $alloc['cid'], 'timestamp' => $timestamp];
         }, $confirmableAllocations);
 
@@ -146,7 +146,7 @@ class EvolvClient
         $contaminations = $this->context->get('experiments.contaminations');
         $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations);
 
-        $contaminatableAllocations = array_filter($allocations, function($alloc) {
+        $contaminatableAllocations = array_filter($allocations, function($alloc) use ($contaminatedCids, $allExperiments) {
             return !array_search($alloc['cid'], $contaminatedCids) &&
                 ($allExperiments || array_search($alloc['eid'], $this->store->activeEids));
         });
@@ -157,7 +157,7 @@ class EvolvClient
 
         $timestamp = time();
 
-        $contextContaminations = array_map(function($alloc) {
+        $contextContaminations = array_map(function($alloc) use ($timestamp) {
             return ['cid' => $alloc['cid'], 'timestamp' => $timestamp];
         }, $contaminatableAllocations);
 
