@@ -2,21 +2,27 @@
 
 namespace Utils;
 
-function setKeyToValue(string $key, $value, array &$array) {
+function setKeyToValue(string $key, $value, array &$array)
+{
     $keys = explode('.', $key);
 
-    $keys = array_reverse($keys);
+    $k = array_shift($keys);
 
-    foreach ($keys as $i => $k) {
-
-        $setval = ($i === 0) ? $value : $array;
-
-        $array = [
-            $k => $setval
-        ];
-
-    }
-
-    return $value;
+    addKeyToArray($k, $keys, $value, $array);
 }
 
+function addKeyToArray(string $k, array $keys, $value, array &$array)
+{
+    if (!count($keys)) {
+        $array[$k] = $value;
+        return;
+    }
+
+    if (!array_key_exists($k, $array)) {
+        $array[$k] = [];
+    }
+
+    $nextKey = array_shift($keys);
+
+    addKeyToArray($nextKey, $keys, $value, $array[$k]);
+}
