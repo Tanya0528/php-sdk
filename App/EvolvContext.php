@@ -6,8 +6,18 @@ namespace App\EvolvContext;
 
 use function Utils\setKeyToValue;
 use function Utils\getValueForKey;
+use function Utils\emit;
 require_once __DIR__ . '/../Utils/setKeyToValue.php';
 require_once __DIR__ . '/../Utils/getValueForKey.php';
+require_once __DIR__ . '/../Utils/waitForIt.php';
+
+
+const CONTEXT_CHANGED = 'context.changed';
+const CONTEXT_INITIALIZED = 'context.initialized';
+const CONTEXT_VALUE_REMOVED = 'context.value.removed';
+const CONTEXT_VALUE_ADDED = 'context.value.added';
+const CONTEXT_VALUE_CHANGED = 'context.value.changed';
+const CONTEXT_DESTROYED = 'context.destroyed';
 
 class Context
 {
@@ -80,6 +90,7 @@ class Context
         $this->initialized = true;
 
         // TODO: emit CONTEXT_INITIALIZED event
+        emit(CONTEXT_INITIALIZED, array_merge_recursive($this->remoteContext, $this->localContext));
     }
 
     public function __destruct()
@@ -101,10 +112,23 @@ class Context
     {
         $this->ensureInitialized();
 
+        $before = null;
+        if ($local) {
+            $before = getValueForKey($key, $this->localContext);
+        } else {
+            $before = getValueForKey($key, $this->remoteContext);
+        }
+
         if ($local) {
             setKeyToValue($key, $value, $this->localContext);
         } else {
             setKeyToValue($key, $value, $this->remoteContext);
+        }
+
+        if (is_null($before)) {
+            emit(CONTEXT_VALUE_ADDED, $key, $value, $local);
+        } else {
+            emit(CONTEXT_VALUE_CHANGED, $key, $value, $local);
         }
     }
 
@@ -133,7 +157,7 @@ class Context
      *
      * @param key {String} The key to remove from the context.
      */
-    public function remote(string $key)
+    public function remove(string $key)
     {
         $this->ensureInitialized();
     }

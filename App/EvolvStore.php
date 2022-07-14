@@ -16,7 +16,7 @@ class Store
     private bool $initialized = false;
     private string $environment;
     private string $endpoint;
-    private $context;
+    private Context $context;
     public $genomeKeyStates = [];
     public $configKeyStates = [];
     public $activeEids = [];
@@ -77,7 +77,7 @@ class Store
 
         $configKeyStates = $this->configKeyStates;
 
-        $context = $this->context->getRemoteContext();
+        $context = array_merge_recursive($this->context->remoteContext, $this->context->localContext);
 
         $keys = $predicate->evaluate($context, $configKeyStates);
 

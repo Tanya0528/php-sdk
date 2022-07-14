@@ -57,16 +57,6 @@ function display($arr, $title = null)
 <!-- END HEAD -->
 <!-- BODY -->
 <body id="body" data-spy="scroll" data-target=".header">
-
-<!--========== HEADER ==========-->
-
-<!--========== END HEADER ==========-->
-
-<!--========== SLIDER ==========-->
-<!--========== SLIDER ==========-->
-
-<!--========== PAGE LAYOUT ==========-->
-<!-- About -->
         <div class="content-lg container">
             <div class="row">
                 <div class="col-md-12 col-sm-12 md-margin-b-60">
@@ -74,36 +64,30 @@ function display($arr, $title = null)
                     <?php
 
                         $environment = '758012fca1';
-                        $uid = 'user_id';
+                        $uid = '12345';
                         $endpoint = 'https://participants.evolv.ai/v1';
 
                         $client = new EvolvClient($environment);
+
+                        $client->on('initialized', function() {
+                            display('INITIALIZED');
+                        });
+
+                        $client->on('context.value.changed', function($type, $key, $value) {
+                            display("CONTEXT_VALUE_CHANGED. KEY: $key, VALUE: $value");
+                        });
+
                         $client->initialize($uid);
 
                         $client->context->set('native.newUser', true);
                         $client->context->set('native.pageCategory', 'home');
-
-                        $activeKeys = $client->getActiveKeys();
-
-                        display($activeKeys, 'Active Keys');
-
-                        display($client->context->remoteContext, 'Remote Context');
+                        $client->context->set('native.pageCategory', 'pdp');
 
                         ?>
                     </div>
                 </div>
             </div>
-            <!--// end row -->
         </div>
-
-<!-- End About -->
-
-<!-- End Contact -->
-<!--========== END PAGE LAYOUT ==========-->
-
-<!--========== FOOTER ==========-->
-
-<!--========== END FOOTER ==========-->
 
 <!-- Back To Top -->
 <a href="javascript:void(0);" class="js-back-to-top back-to-top">Top</a>

@@ -2,7 +2,7 @@
 
 namespace Utils;
 
-function getValueForKey(string $key, array $array): ?\mixed {
+function getValueForKey(string $key, array $array) {
     $value = null;
     $current = $array;
     $keys = explode('.', $key);
