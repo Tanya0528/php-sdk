@@ -13,3 +13,9 @@ This allow you run docker and docker-compose without sudo
 </ul>
 
 <strong>Easy local setup</strong>
+<ul>
+  <li>git clone https://github.com/evolv-ai/php-sdk.git</li>
+  <li>cd php-sdk <li>
+  <li>run docker-compose up -d</li>
+  <li>Open http://localhost:8000/</li>
+</ul>
