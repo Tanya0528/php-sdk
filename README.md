@@ -1,6 +1,7 @@
 <h1>Evolv Php-Sdk</h1>
 This SDK is designed to be integrated into projects to allow for optimizing with Evolv.
-<strong>Install docker and docker-compose</strong>
+
+<h3>Install docker and docker-compose</h3>
 <ul>
 <li>Windows https://store.docker.com/editions/community/docker-ce-desktop-windows/</li>
 <li>Linux http://docker.crank.ru/docs/docker-engine/install/on-linux-distributions/</li>
