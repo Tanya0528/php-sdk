@@ -8,10 +8,12 @@ use function Utils\getValueForKey;
 use function Utils\setKeyToValue;
 use function Utils\removeValueForKey;
 use function Utils\emit;
+use function Utils\flatten;
 require_once __DIR__ . '/../Utils/getValueForKey.php';
 require_once __DIR__ . '/../Utils/setKeyToValue.php';
 require_once __DIR__ . '/../Utils/removeValueForKey.php';
 require_once __DIR__ . '/../Utils/waitForIt.php';
+require_once __DIR__ . '/../Utils/flatten.php';
 
 
 const CONTEXT_CHANGED = 'context.changed';
@@ -94,7 +96,7 @@ class Context
         if (is_null($before)) {
             emit(CONTEXT_VALUE_ADDED, $key, $value, $local);
         } else {
-            emit(CONTEXT_VALUE_CHANGED, $key, $value, $local);
+            emit(CONTEXT_VALUE_CHANGED, $key, $value, $before, $local);
         }
         emit(CONTEXT_CHANGED, $this->resolve());
     }
@@ -148,7 +150,33 @@ class Context
      * @param update {Object} The values to update the context with.
      * @param local {Boolean} If true, the values will only be added to the localContext.
      */
-    public function update($update, $local = false) {
+    public function update(array $update, $local = false) {
         $this->ensureInitialized();
+        $context = null;
+    
+        if ($local) {
+            $context = &$this->localContext;
+        } else {
+            $context = &$this->remoteContext;
+        }
+
+        $flattened = flatten($update);
+        $flattenedBefore = flatten($context);
+
+        if ($local) {
+            $this->localContext = array_merge_recursive($this->localContext, $update);
+        } else {
+            $this->remoteContext = array_merge_recursive($this->remoteContext, $update);
+        }
+
+        $updated = $this->resolve();
+        foreach ($flattened as $key => $value) {
+            if (!array_key_exists($key, $flattenedBefore)) {
+                emit(CONTEXT_VALUE_ADDED, $key, $value, $local, $updated);
+            } else if ($flattenedBefore[$key] !== $value) {
+                emit(CONTEXT_VALUE_CHANGED, $key, $value, $flattenedBefore[$key], $local, $updated);
+            }
+        }
+        emit(CONTEXT_CHANGED, $updated);
     }
 }

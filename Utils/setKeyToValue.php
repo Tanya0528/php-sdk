@@ -2,7 +2,7 @@
 
 namespace Utils;
 
-function setKey(string $k, array $keys, $value, array &$array)
+function set_key_recursive(string $k, array $keys, $value, array &$array)
 {
     if (!count($keys)) {
         $array[$k] = $value;
@@ -15,7 +15,7 @@ function setKey(string $k, array $keys, $value, array &$array)
 
     $nextKey = array_shift($keys);
 
-    setKey($nextKey, $keys, $value, $array[$k]);
+    set_key_recursive($nextKey, $keys, $value, $array[$k]);
 }
 
 function setKeyToValue(string $key, $value, array &$array)
@@ -24,5 +24,5 @@ function setKeyToValue(string $key, $value, array &$array)
 
     $k = array_shift($keys);
 
-    setKey($k, $keys, $value, $array);
+    set_key_recursive($k, $keys, $value, $array);
 }

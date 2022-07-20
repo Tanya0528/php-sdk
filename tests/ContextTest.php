@@ -65,4 +65,42 @@ class ContextTest extends TestCase {
         $this->assertTrue($removed);
         $this->assertEquals($this->context->remoteContext, ['native' => ['pdp' => true]]);
     }
+
+    /**
+     * @group context_update
+     */
+    public function testRemoveContextIsUpdated() {
+        // Arrange
+        $this->context->set('active.variants', true);
+
+        // Act
+        $this->context->update(['active' => ['keys' => true]]);
+
+        // Assert
+        $this->assertEquals($this->context->remoteContext, [
+            'active' => [
+                'variants' => true,
+                'keys' => true
+            ]
+        ]);
+    }
+
+    /**
+     * @group context_update
+     */
+    public function testLocalContextIsUpdated() {
+        // Arrange
+        $this->context->set('active.variants', true, true);
+
+        // Act
+        $this->context->update(['active' => ['keys' => true]], true);
+
+        // Assert
+        $this->assertEquals($this->context->localContext, [
+            'active' => [
+                'variants' => true,
+                'keys' => true
+            ]
+        ]);
+    }
 }

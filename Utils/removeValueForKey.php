@@ -2,7 +2,7 @@
 
 namespace Utils;
 
-function removeKey(string $key, array $keys, array &$array)
+function remove_key_recursive(string $key, array $keys, array &$array)
 {
     if (!array_key_exists($key, $array)) {
         return false;
@@ -15,7 +15,7 @@ function removeKey(string $key, array $keys, array &$array)
 
     $nextKey = array_shift($keys);
 
-    $removed = removeKey($nextKey, $keys, $array[$key]);
+    $removed = remove_key_recursive($nextKey, $keys, $array[$key]);
     if ($removed && !count(array_keys($array[$key]))) {
         unset($array[$key]);
     }
@@ -28,5 +28,5 @@ function removeValueForKey(string $key, array &$array) {
 
     $currentKey = array_shift($keys);
 
-    return removeKey($currentKey, $keys, $array);
+    return remove_key_recursive($currentKey, $keys, $array);
 }
