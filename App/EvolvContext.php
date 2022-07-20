@@ -41,6 +41,8 @@ class Context
 
     private function resolve()
     {
+        $this->ensureInitialized();
+
         return array_merge_recursive($this->remoteContext, $this->localContext);
     }
 
