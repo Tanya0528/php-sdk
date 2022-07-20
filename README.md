@@ -7,7 +7,7 @@ This SDK is designed to be integrated into projects to allow for optimizing with
 <li>Linux http://docker.crank.ru/docs/docker-engine/install/on-linux-distributions/</li>
 <li>Mac http://docker.crank.ru/docs/docker-engine/install/installation-on-mac-os-x/</li>
 </ul>
-<strong>Add user to docker group</strong>
+<h3>Add user to docker group</h3>
 
 This allow you run docker and docker-compose without sudo
 
@@ -15,7 +15,7 @@ This allow you run docker and docker-compose without sudo
 <li>sudo usermod -aG docker $USER</li>
 </ul>
 
-<strong>Easy local setup</strong>
+<h3>Easy local setup</h3>
 <ul>
   <li><code>git clone https://github.com/evolv-ai/php-sdk.git</code></li>
   <li><code>cd php-sdk </code></li>
