@@ -26,38 +26,38 @@ class Beacon {
 
         $data = json_encode($payload);
 
-        echo $this->endpoint;
+        // echo $this->endpoint;
 
-        $curl = curl_init();
+        // $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL, $this->endpoint);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($curl, CURLOPT_URL, $this->endpoint);
+        // curl_setopt($curl, CURLOPT_POST, true);
+        // curl_setopt($curl, CURLOPT_HEADER, true);
+        // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        $headers = array(
-            "Accept: application/json",
-            "Content-Type: application/json",
-        );
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        // $headers = array(
+        //     "Accept: application/json",
+        //     "Content-Type: application/json",
+        // );
+        // curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
-        $data = <<<DATA
-        $data
-        DATA;
+        // $data = <<<DATA
+        // $data
+        // DATA;
 
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
+        // echo '<pre>';
+        // print_r($data);
+        // echo '</pre>';
 
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
-        $res = curl_exec($curl);
+        // $res = curl_exec($curl);
 
-        echo "<pre>";
-        print_r($res);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($res);
+        // echo "</pre>";
 
-        curl_close($curl);
+        // curl_close($curl);
 
         $this->messages = [];
     }

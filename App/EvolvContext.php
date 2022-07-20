@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\EvolvContext;
 
-use function Utils\setKeyToValue;
 use function Utils\getValueForKey;
+use function Utils\setKeyToValue;
+use function Utils\removeValueForKey;
 use function Utils\emit;
-require_once __DIR__ . '/../Utils/setKeyToValue.php';
 require_once __DIR__ . '/../Utils/getValueForKey.php';
+require_once __DIR__ . '/../Utils/setKeyToValue.php';
+require_once __DIR__ . '/../Utils/removeValueForKey.php';
 require_once __DIR__ . '/../Utils/waitForIt.php';
 
 
@@ -21,56 +23,21 @@ const CONTEXT_DESTROYED = 'context.destroyed';
 
 class Context
 {
-    public $current = [];
-    public $set = [];
-    public $value;
-    public $local;
-    public $context;
-    public $result;
-
-    
     public string $uid;
     public array $remoteContext = [];
     public array $localContext = [];
     private bool $initialized = false;
-
-    /**
-     * A unique identifier for the participant.
-     *
-     * @return string
-     */
-    public function getUid(): string
-    {
-        return $this->uid;
-    }
-
-    /**
-     * The context information for evaluation of predicates and analytics.
-     *
-     * @return array
-     */
-    public function getRemoteContext(): array
-    {
-        // TODO: return cloned copy of remoteContext
-        return $this->remoteContext;
-    }
-
-    /**
-     * The context information for evaluation of predicates only, and not used for analytics.
-     *
-     * @return array
-     */
-    public function getLocalContext(): array
-    {
-        // TODO: return cloned copy of localContext
-       return $this->localContext; 
-    }
 
     private function ensureInitialized(): void
     {
         if (!$this->initialized) {
             throw new \Exception('Evolv: The context is not initialized');
         }
+    }
+
+    private function resolve()
+    {
+        return array_merge_recursive($this->remoteContext, $this->localContext);
     }
 
     public function initialize($uid, $remoteContext = [], $localContext = [])
@@ -89,13 +56,12 @@ class Context
 
         $this->initialized = true;
 
-        // TODO: emit CONTEXT_INITIALIZED event
-        emit(CONTEXT_INITIALIZED, array_merge_recursive($this->remoteContext, $this->localContext));
+        emit(CONTEXT_INITIALIZED, $this->resolve());
     }
 
     public function __destruct()
     {
-        // TODO: emit CONTEXT_DESTROYED event
+        emit(CONTEXT_DESTROYED);
     }
 
     /**
@@ -130,6 +96,7 @@ class Context
         } else {
             emit(CONTEXT_VALUE_CHANGED, $key, $value, $local);
         }
+        emit(CONTEXT_CHANGED, $this->resolve());
     }
 
     /**
@@ -160,6 +127,17 @@ class Context
     public function remove(string $key)
     {
         $this->ensureInitialized();
+        $local = removeValueForKey($key, $this->localContext);
+        $remote = removeValueForKey($key, $this->remoteContext);
+        $removed = $local || $remote;
+    
+        if ($removed) {
+            $updated = $this->resolve();
+            emit(CONTEXT_VALUE_REMOVED, $key, !$remote, $updated);
+            emit(CONTEXT_CHANGED, $updated);
+        }
+    
+        return $removed;
     }
 
     /**

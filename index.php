@@ -57,25 +57,27 @@ function display($arr, $title = null)
 <!-- END HEAD -->
 <!-- BODY -->
 <body id="body" data-spy="scroll" data-target=".header">
+    
         <div class="content-lg container">
             <div class="row">
                 <div class="col-md-12 col-sm-12 md-margin-b-60">
                     <div class="margin-t-50 margin-b-30">
                     <?php
 
-                        $environment = '758012fca1';
+                        $environment = '7f4099bfbc';
                         $uid = '12345';
-                        $endpoint = 'https://participants.evolv.ai/v1';
+                        $endpoint = 'https://participants-stg.evolv.ai/';
 
-                        $client = new EvolvClient($environment);
+                        $client = new EvolvClient($environment, $endpoint);
 
-                        $client->on('initialized', function() {
-                            display('INITIALIZED');
-                        });
+                        // listening to lifecycle events
+                        // $client->on('initialized', function() {
+                        //     display('INITIALIZED');
+                        // });
 
-                        $client->on('context.value.changed', function($type, $key, $value) {
-                            display("CONTEXT_VALUE_CHANGED. KEY: $key, VALUE: $value");
-                        });
+                        // $client->on('context.value.changed', function($type, $key, $value) {
+                        //     display("CONTEXT_VALUE_CHANGED. KEY: $key, VALUE: $value");
+                        // });
 
                         $client->initialize($uid);
 
@@ -83,7 +85,7 @@ function display($arr, $title = null)
                         $client->context->set('native.pageCategory', 'home');
                         $client->context->set('native.pageCategory', 'pdp');
 
-                        ?>
+                    ?>
                     </div>
                 </div>
             </div>

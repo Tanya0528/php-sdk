@@ -2,16 +2,7 @@
 
 namespace Utils;
 
-function setKeyToValue(string $key, $value, array &$array)
-{
-    $keys = explode('.', $key);
-
-    $k = array_shift($keys);
-
-    addKeyToArray($k, $keys, $value, $array);
-}
-
-function addKeyToArray(string $k, array $keys, $value, array &$array)
+function setKey(string $k, array $keys, $value, array &$array)
 {
     if (!count($keys)) {
         $array[$k] = $value;
@@ -24,5 +15,14 @@ function addKeyToArray(string $k, array $keys, $value, array &$array)
 
     $nextKey = array_shift($keys);
 
-    addKeyToArray($nextKey, $keys, $value, $array[$k]);
+    setKey($nextKey, $keys, $value, $array[$k]);
+}
+
+function setKeyToValue(string $key, $value, array &$array)
+{
+    $keys = explode('.', $key);
+
+    $k = array_shift($keys);
+
+    setKey($k, $keys, $value, $array);
 }

@@ -18,20 +18,20 @@ class SetKeyToValueTest extends TestCase {
         $this->assertEquals($array, ['native' => 15]);
     }
 
-    // public function testNewKeyIsAddedToNestedArray() {
-    //     //Arrange
-    //     $array = ['native' => ['pdp' => ['page_layout' => 'Layout 1']]];
+    public function testNewKeyIsAddedToNestedArray() {
+        //Arrange
+        $array = ['native' => ['pdp' => ['page_layout' => 'Layout 1']]];
 
-    //     // Act
-    //     setKeyToValue('native.pdp.extra_key', true, $array);
+        // Act
+        setKeyToValue('native.pdp.extra_key', true, $array);
 
-    //     // Assert
-    //     $this->assertEquals($array, [
-    //         'native' =>
-    //             ['pdp' => [
-    //                 'page_layout' => 'Layout 1',
-    //                 'extra_key' => true
-    //             ]]
-    //         ]);
-    // }
+        // Assert
+        $this->assertEquals($array, [
+            'native' =>
+                ['pdp' => [
+                    'page_layout' => 'Layout 1',
+                    'extra_key' => true
+                ]]
+            ]);
+    }
 }
