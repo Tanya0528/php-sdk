@@ -5,9 +5,11 @@
 <li>Mac http://docker.crank.ru/docs/docker-engine/install/installation-on-mac-os-x/</li>
 </ul>
 <strong>Add user to docker group</strong>
-<ul>
+
 This allow you run docker and docker-compose without sudo
+
 <ul>
 <li>sudo usermod -aG docker $USER</li>
 </ul>
+
 <strong>Easy local setup</strong>
