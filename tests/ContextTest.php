@@ -103,4 +103,22 @@ class ContextTest extends TestCase {
             ]
         ]);
     }
+
+    /**
+     * @group context_pushToArray
+     */
+    public function testValueIsAddedToSpecifiedArrayInContext() {
+        // Arrange
+        $this->context->set('my.events', ['event1']);
+
+        // Act
+        $this->context->pushToArray('my.events', 'event2');
+
+        // Assert
+        $this->assertEquals([
+            'my' => [
+                'events' => ['event1', 'event2']
+            ]
+        ], $this->context->remoteContext);
+    }
 }

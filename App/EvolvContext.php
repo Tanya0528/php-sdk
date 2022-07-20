@@ -23,6 +23,8 @@ const CONTEXT_VALUE_ADDED = 'context.value.added';
 const CONTEXT_VALUE_CHANGED = 'context.value.changed';
 const CONTEXT_DESTROYED = 'context.destroyed';
 
+const DEFAULT_QUEUE_LIMIT = 50;
+
 class Context
 {
     public string $uid;
@@ -178,5 +180,48 @@ class Context
             }
         }
         emit(CONTEXT_CHANGED, $updated);
+    }
+
+    /**
+     * Checks if the specified key is currently defined in the context.
+     *
+     * @param key The key to check.
+     * @returns {boolean} True if the key has an associated value in the context.
+     */
+    public function contains(string $key)
+    {
+        $this->ensureInitialized();
+
+        return array_key_exists($key, $this->remoteContext) || array_key_exists($key, $this->localContext);
+    }
+
+    /**
+     * Adds value to specified array in context. If array doesnt exist its created and added to.
+     *
+     * @param key The array to add to.
+     * @param value Value to add to the array.
+     * @param local {Boolean} If true, the value will only be added to the localContext.
+     * @param limit {Number} Max length of array to maintain.
+     * @returns {boolean} True if value was successfully added.
+     */
+    public function pushToArray(string $key, $value, $local = false, $limit = null)
+    {
+        $limit = $limit ?? DEFAULT_QUEUE_LIMIT;
+
+        $this->ensureInitialized();
+
+        if ($local) {
+            $context = &$this->localContext;
+        } else {
+            $context = &$this->remoteContext;
+        }
+
+        $originalArray = getValueForKey($key, $context) ?? [];
+
+        $combined = array_merge($originalArray, [$value]);
+
+        $newArray = array_slice($combined, count($combined) - $limit);
+
+        return $this->set($key, $newArray, $local);
     }
 }
