@@ -11,7 +11,7 @@ use App\Beacon;
 use function App\Utils\waitFor;
 use function App\Utils\emit;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/EvolvStore.php';
 require_once __DIR__ . '/Beacon.php';
 require_once __DIR__ . '/Utils/waitForIt.php';
