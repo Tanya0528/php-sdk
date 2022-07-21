@@ -1,11 +1,11 @@
 <?php
+
 declare (strict_types=1);
 
 use  App\EvolvClient;
 
 require_once __DIR__ . '/../App/EvolvClient.php';
-
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 function display($arr, $title = null)
 {
@@ -114,16 +114,6 @@ function display($arr, $title = null)
             $endpoint = 'https://participants-stg.evolv.ai/';
 
             $client = new EvolvClient($environment, $endpoint);
-
-            // listening to lifecycle events
-            // $client->on('initialized', function() {
-            //     display('INITIALIZED');
-            // });
-
-            // $client->on('context.value.changed', function($type, $key, $value) {
-            //     display("CONTEXT_VALUE_CHANGED. KEY: $key, VALUE: $value");
-            // });
-
             $client->initialize($uid);
 
             $client->on('confirmed', function() use ($client) {
@@ -133,18 +123,6 @@ function display($arr, $title = null)
             $client->on('contaminated', function() use ($client) {
                 display('CONTAMINATED');
             });
-
-            // $client->context->set('native.pageCategory', 'pdp');
-
-            // display($client->context->remoteContext, 'CONTEXT')
-
-            // $client->getActiveKeys('', function($keys) {
-            //     display($keys, 'Active Keys');
-            // });
-
-            // $client->get('pdp.page_layout', function($key) {
-            //     display($key, 'pdp');
-            // });
 
             $client->context->set('native.newUser', true);
             $client->context->set('native.pageCategory', 'home');
