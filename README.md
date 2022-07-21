@@ -15,11 +15,11 @@ Install Lodash-PHP through composer:
 <h2>Usage</h2>
 
 <code>
-  
+  <?php
   declare (strict_types=1);
   use  App\EvolvClient;
   require_once __DIR__ . '/App/EvolvClient.php';
   require 'vendor/autoload.php';
   $client = new EvolvClient($environment, $uid, $endpoint);
-
+  ?>
 </code>
