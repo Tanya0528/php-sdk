@@ -18,7 +18,6 @@ function display($arr, $title = null)
     echo "</pre>";
 }
 
-
 ?>
 <html lang="en" class="no-js">
 <!-- BEGIN HEAD -->
@@ -81,12 +80,13 @@ function display($arr, $title = null)
 
                         $client->initialize($uid);
 
-
                         $client->on('confirmed', function() use ($client) {
                             display('CONFIRMED');
                             $client->contaminate(['reason' => 'no special reason']);
                         });
-
+                        $client->on('contaminated', function() use ($client) {
+                            display('CONTAMINATED');
+                        });
 
                         // $client->context->set('native.pageCategory', 'pdp');
 

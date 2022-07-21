@@ -9,55 +9,59 @@ require 'vendor/autoload.php';
 require_once __DIR__ . '/EvolvStore.php';
 require_once __DIR__ . '/Beacon.php';
 
-ini_set('display_errors', 'on');
+const ENDPOINT_PATTERN = "/\/(v\d+)\/\w+\/([a-z]+)$/i";
 
 class Beacon {
     private string $endpoint;
     private Context $context;
     private array $messages = [];
+    private bool $v1Events;
 
     public function __construct(string $endpoint, Context $context)
     {
         $this->endpoint = $endpoint;
         $this->context = $context;
+
+        preg_match(ENDPOINT_PATTERN, $endpoint, $matches);
+        $this->v1Events = $matches && $matches[1] === 'v1' && $matches[2] === 'events';
     }
 
     private function send($payload) {
 
         $data = json_encode($payload);
 
-        // echo $this->endpoint;
+        echo $this->endpoint;
 
-        // $curl = curl_init();
+        $curl = curl_init();
 
-        // curl_setopt($curl, CURLOPT_URL, $this->endpoint);
-        // curl_setopt($curl, CURLOPT_POST, true);
-        // curl_setopt($curl, CURLOPT_HEADER, true);
-        // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_URL, $this->endpoint);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        // $headers = array(
-        //     "Accept: application/json",
-        //     "Content-Type: application/json",
-        // );
-        // curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $headers = array(
+            "Accept: application/json",
+            "Content-Type: application/json",
+        );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
-        // $data = <<<DATA
-        // $data
-        // DATA;
+        $data = <<<DATA
+        $data
+        DATA;
 
-        // echo '<pre>';
-        // print_r($data);
-        // echo '</pre>';
+        echo '<pre>';
+        print_r($data);
+        echo '</pre>';
 
-        // curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
-        // $res = curl_exec($curl);
+        $res = curl_exec($curl);
 
-        // echo "<pre>";
-        // print_r($res);
-        // echo "</pre>";
+        echo "<pre>";
+        print_r($res);
+        echo "</pre>";
 
-        // curl_close($curl);
+        curl_close($curl);
 
         $this->messages = [];
     }
@@ -77,7 +81,17 @@ class Beacon {
             return;
         }
 
-        $this->send($this->wrapMessages());
+        if ($this->v1Events) {
+            foreach($this->messages as $message) {
+                $editedMessage = $message;
+                $editedMessage = $message['payload'] ?? [];
+                $editedMessage['type'] = $message['type'];
+
+                $this->send($editedMessage);
+            }
+        } else {
+            $this->send($this->wrapMessages());
+        }
     }
 
     public function emit(string $type, $payload, bool $flush = false)
