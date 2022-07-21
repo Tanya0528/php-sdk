@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\EvolvBeacon;
+namespace App;
 
-use App\EvolvContext\Context;
+use App\Context;
 
 require 'vendor/autoload.php';
 require_once __DIR__ . '/EvolvStore.php';

@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use App\EvolvClient\EvolvClient;
+use App\EvolvClient;
 require_once __DIR__ . '/../App/EvolvClient.php';
 
 
@@ -14,7 +14,7 @@ class ClientTest extends TestCase {
         $uid = 'uid';
 
         $client = new EvolvClient($environment, $uid, $endpoint);
-        $client->initialize($environment, $uid, $endpoint, [], []);
+        $client->initialize($uid);
 
         // TODO: verify two requests are made
     }

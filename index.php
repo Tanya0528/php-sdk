@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);
 
-use  App\EvolvClient\EvolvClient;
+use  App\EvolvClient;
 
 require_once __DIR__ . '/App/EvolvClient.php';
 
@@ -83,7 +83,9 @@ function display($arr, $title = null)
 
                         $client->context->set('native.newUser', true);
                         $client->context->set('native.pageCategory', 'home');
-                        $client->context->set('native.pageCategory', 'pdp');
+                        // $client->context->set('native.pageCategory', 'pdp');
+
+                        display($client->context->remoteContext, 'CONTEXT')
 
                     ?>
                     </div>

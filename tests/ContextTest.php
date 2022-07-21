@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use App\EvolvContext\Context;
+use App\Context;
 require_once __DIR__ . '/../App/EvolvContext.php';
 
 

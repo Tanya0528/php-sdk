@@ -1,272 +1,157 @@
 <?php
 
-namespace App\EvolvPredicate;
+namespace App;
+use function Utils\getValueForKey;
 
-require_once __DIR__ . '/EvolvOptions.php';
+require_once __DIR__ . '/../Utils/getValueForKey.php';
+
+function regexFromString($string)
+{
+    if (strpos($string, '/') !== 0) {
+        return '/' . $string . '/';
+    }
+
+    return $string;
+}
+
+function regex64Match($value, $b64pattern)
+{
+    try {
+        $string = base64_decode($b64pattern);
+        return $value && preg_match(regexFromString($string), $value, $matches) !== null;
+    } catch (\Throwable $th) {
+        return false;
+    }
+}
 
 class Predicate
 {
-    public $predicate = [];
+    private array $filters;
 
-    public $param = [];
-
-    public $a = 'a';
-
-    public $b = 'b';
-
-    public $res;
-
-    public $result;
-
-    public $activeKeys = [];
-
-    public $parentPredicate = false;
-
-    public $extra_key = false;
-
-    public function exists($a)
+    public function __construct()
     {
-        $result = (!empty($a) && isset($a)) ? true : false;
-
-        return $result;
+        $this->filters = [
+            'contains' => function ($a, $b) { return in_array($a, $b); },
+            'defined' => function ($a, $b) { return (isset($a) && !empty($a)) ? true : false; },
+            'equal' => function ($a, $b) { return $a === $b; },
+            'exists' => function ($a, $b) { return (!empty($a) && isset($a)) ? true : false; },
+            'greater_than' => function ($a, $b) { return ($a > $b) ? true : false; },
+            'greater_than_or_equal_to' => function ($a, $b) { ($a >= $b) ? true : false; },
+            'is_true' => function ($a, $b) { return $a === true ? true : false; },
+            'is_false' => function ($a, $b) { return $a === false ? true : false; },
+            'not_exists' => function ($a, $b) { return (empty($a)) ? true : false; },
+            'not_contains' => function ($a, $b) { return !in_array($a, $b); },
+            'not_defined' => function ($a, $b) { return (isset($a) == false && empty($a)) ? true : false; },
+            'not_equal' => function ($a, $b) { return ($a !== $b) ? true : false; },
+            'not_regex_match' => function ($value, $pattern) { return !preg_match($value, $pattern, $matches); },
+            'not_regex64_match' => function ($value, $pattern) { return !regex64Match($value, $pattern); },
+            'not_starts_with' => function ($a, $b) { return strpos($a, $b) !== 0; },
+            'kv_contains' => function ($obj, $params) { return $obj[$params[0]] !== $params[1]; },
+            'kv_equal' => function ($obj, $params) { return $obj[$params[0]] === $params[1]; },
+            'kv_not_contains' => function ($obj, $params) { return $obj[$params[0]] === $params[1]; },
+            'kv_not_equal' => function ($obj, $params) { return $obj[$params[0]] !== $params[1]; },
+            'less_than' => function ($a, $b) { return $a < $b; },
+            'less_than_or_equal_to' => function ($a, $b) { return $a <= $b; },
+            'loose_equal' => function ($a, $b) { return $a == $b ? true : false; },
+            'loose_not_equal' => function ($a, $b) { return $a != $b ? true : false; },
+            'regex_match' => function ($a, $b) { return $a != $b ? true : false; },
+            'regex64_match' => function ($value, $pattern) { return regex64Match($value, $pattern); },
+            'starts_with' => function ($a, $b) { return strpos($a, $b) === 0; }
+        ];
     }
 
-    public function convertSpace($string)
-    {
-        return $string = "true";
-    }
+    private function evaluateFilter($context, $rule): bool {
+        $value = getValueForKey($rule['field'], $context);
 
-
-    public function greater_than($a, $b)
-    {
-        $result = $a >= $b ? true : false;
-
-        return $result;
-    }
-
-    public function greater_than_or_equal_to($a, $b)
-    {
-        $result = $a >= $b ? true : false;
-
-        return $result;
-    }
-
-    public function is_true($a, $b)
-    {
-        $result = $a === true ? true : false;
-
-        return $result;
-    }
-
-    public function is_false($a)
-    {
-        $result = $a === false ? true : false;
-
-        return $result;
-    }
-
-    public function loose_equal($a, $b)
-    {
-        $result = $a === $b ? true : false;
-
-        return $result;
-    }
-
-
-    function not_exists($a, $b)
-    {
-
-        $result = (empty($a)) ? true : false;
-
-        return $result;
-    }
-
-    public $keys = [];
-
-
-    public function getContextKey($cntxt, $key, $field, $callback, $b)
-    {
-
-        foreach ($cntxt as $keyC => $valueC) {
-
-            $this->extra_key = $keyC == "extra_key" ? true : false;
-
-            if ($keyC == $field && $this->extra_key == false) {
-
-                $a = is_array($valueC) ? is_array($valueC) : $valueC;
-
-                $this->result = call_user_func_array([$this, $callback], [$a, $b]);
-
-                if ($callback == "is_true" && $this->result === true) $this->parentPredicate = true;
-
-                if ($this->result == true && $this->parentPredicate == true) {
-
-                    if ($key !== 0) {
-                        $this->activeKeys[] = $key;
-                    }
-                }
-            }
-        }
-    }
-
-
-    public function evaluatePredicate($context, $config)
-    {
-        $cntxt = $this->getKeyFromValeuContext($context);
-
-        if (is_array($config)) {
-
-            foreach ($config as $key => $value) {
-
-                if (is_array($value) && isset($value["_predicate"])) {
-
-                    if (is_array($cntxt) || is_object($cntxt)) {
-
-                        $field = $value['_predicate']['rules'][0]['field'];
-
-                        $b = $value['_predicate']['rules'][0]['value'];
-
-                        $callback = $value['_predicate']['rules'][0]['operator'];
-
-                        $combinator = $value['_predicate']['combinator'];
-
-                        $this->getContextKey($cntxt, $key, $field, $callback, $b);
-
-                        if ( $combinator == "and" && $this->result == true && $this->parentPredicate == true) {
-
-                            foreach ($value as $k => $val) {
-
-                                if ($k[0] !== "_" && is_array($val) && count($val) > 0 && !isset($val['_predicate'])) {
-
-                                    $this->activeKeys[] = $key . "." . $k;
-
-                                } else if (isset($val['_predicate'])) {
-
-                                    $field = $val['_predicate']['rules'][0]['field'];
-
-                                    $callback  = $val['_predicate']['rules'][0]['operator'];
-
-                                    if ($field == 'extra_key' && $this->extra_key == false) {
-
-                                        $this->activeKeys[] = $key . "." . $k;
-                                    }
-                                    else{
-                                        $this->getContextKey($cntxt, $k, $field, $callback, $b);
-                                    }
-
-                                }
-                            }
-
-                        }
-
-                    }
-
-                }
-                $this->evaluatePredicate($context, $value);
-            }
-        }
-        return $this->activeKeys;
-    }
-
-
-    public function regexFromString($string)
-    {
-        if (!strpos($string, '/')) {
-
-            return $string;
-        }
-
-        $split = strripos($string, '/');
-
-        $part = substr($string, 1, $split);
-
-        $part2 = substr($string, 1, $split + 1);
-
-        return strcasecmp($part, $part2);
-
-    }
-
-    public function regex64Match($a, $b)
-    {
-        $result = base64_decode($a) === true ? true : false;
-
-        return $result;
-    }
-
-    public function valueFromKey($context, $key)
-    {
-
-        if (isset($context) == false) {
-
+        if (strpos($rule['operator'], 'kv_') && !$value) {
             return false;
-
-        }
-        $nextToken = substr($key, ".");
-
-        if ($nextToken === 0) {
-
-            echo 'Invalid variant key: ' . $key;
-
         }
 
-        if ($nextToken === -1) {
-
-            return array_key_exists($key, $context) ? $context[$key] : false;
-
-        }
-
-        return $this->valueFromKey(substr($key, 0, $nextToken), substr($key, 0, $nextToken + 1));
+        return $this->filters[$rule['operator']]($value, $rule['value']);
     }
 
-    public function getKeyFromValeuContext($context)
-    {
-        $cntxt = [];
+    private function evaluateRule($context, $predicate, $rule, array &$passedRules, array &$failedRules): bool {
+        $result = false;
 
-        if (isset($context) && is_array($context)) {
-
-            foreach ($context as $key => $value) {
-
-                if (is_array($value)) {
-
-                    foreach ($value as $k => $v) {
-
-                        if (is_array($v)) {
-
-                            foreach ($v as $key => $value) {
-
-                                $cntxt[$k . "." . $key] = $value;
-
-                            }
-                        } elseif (!is_array($v)) {
-                            $cntxt[$k] = $v;
-                        }
-
-                    }
-                }
-            }
+        if (isset($rule['combinator'])) {
+            // No need to add groups to pass/failed rule sets here. Their children results will be merged up
+            // via recursion.
+            return $this->evaluatePredicate($context, $rule, $passedRules, $failedRules);
+        } else {
+            $result = $this->evaluateFilter($context, $rule);
         }
-        return $cntxt;
-    }
 
-
-    public function item($item)
-    {
-        return array_push($this->result['touched'], $item['field']);
-    }
-
-    public
-    function evaluate($context, $predicate)
-    {
-        $this->result = [
-            'passed' => [],
-            'failed' => [],
-            'touched' => []
+        $ruleResult = [
+            'id' => $predicate['id'],
+            'field' => $rule['field']
         ];
 
-        $active = $this->evaluatePredicate($context, $predicate);
+        if ($result) {
+            $passedRules[] = $ruleResult;
+        } else {
+            $failedRules[] = $ruleResult;
+        }
 
-        return $active;
+        return $result;
     }
 
-}
+    private function evaluatePredicate($context, $predicate, array &$passedRules, array &$failedRules): bool
+    {
+        $rules = $predicate['rules'];
 
+        if (!$rules) {
+            return true;
+        }
+
+        for ($i = 0; $i < count($rules); $i++) { 
+            $passed = $this->evaluateRule($context, $predicate, $rules[$i], $passedRules, $failedRules);
+            if ($passed && $predicate['combinator'] === 'or') {
+                return true;
+            }
+            if (!$passed && $predicate['combinator'] === 'and') {
+                return false;
+            }
+        }
+
+        // If we've reached this point on an 'or' all rules failed.
+        return $predicate['combinator'] === 'and';
+    }
+
+    /**
+     * @typedef EvaluationResult
+     * @property {Set<object>} passed
+     * @property {Set<object>} failed
+     * @property {boolean} rejected
+     * @property {Set<string>} touched
+     */
+
+    /**
+     * Evaluates a query against a user object and saves passing/failing rule ids to provided sets.
+     * @param context A context object containing describing the context the predicate should be evaluated against.
+     * @param predicate Nested predicate object that rules structured into groups as a deeply nested tree.
+     *                  note: There is no set limit to the depth of this tree, hence we must work with it
+     *                  using recursion.
+     * @returns {EvaluationResult}
+     */
+    public function evaluate($context, $predicate)
+    {
+        $result = [
+            'passed' => [],
+            'failed' => [],
+            'touched' => [],
+            'rejected' => []
+        ];
+
+        $result['rejected'] = !$this->evaluatePredicate($context, $predicate, $result['passed'], $result['failed']);
+
+        foreach($result['passed'] as $item) {
+            $result['touched'][] = $item['field'];
+        }
+
+        foreach($result['failed'] as $item) {
+            $result['touched'][] = $item['field'];
+        }
+
+        return $result;
+    }
+}

@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use App\EvolvClient\EvolvClient;
+use App\EvolvClient;
 require_once __DIR__ . '/../App/EvolvClient.php';
 
 

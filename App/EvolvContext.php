@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EvolvContext;
+namespace App;
 
 use function Utils\getValueForKey;
 use function Utils\setKeyToValue;
@@ -39,7 +39,7 @@ class Context
         }
     }
 
-    private function resolve()
+    public function resolve()
     {
         $this->ensureInitialized();
 

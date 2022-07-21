@@ -2,15 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\EvolvClient;
+namespace App;
 
-use App\EvolvBeacon\Beacon;
-use  App\EvolvStore\Store;
-use  App\EvolvContext\Context;
-
-use const App\EvolvContext\CONTEXT_INITIALIZED;
-use const App\EvolvContext\CONTEXT_VALUE_ADDED;
-use const App\EvolvContext\CONTEXT_VALUE_CHANGED;
+// use const App\CONTEXT_INITIALIZED;
+// use const App\CONTEXT_VALUE_ADDED;
+// use const App\CONTEXT_VALUE_CHANGED;
 
 use function Utils\waitFor;
 use function Utils\emit;
