@@ -1,24 +1,30 @@
-<h1>Evolv Php-Sdk</h1>
-This SDK is designed to be integrated into projects to allow for optimizing with Evolv.
+<h1>Evolv Php Sdk</h1>
 
-<h3>Install docker and docker-compose</h3>
-<ul>
-<li>Windows https://store.docker.com/editions/community/docker-ce-desktop-windows/</li>
-<li>Linux http://docker.crank.ru/docs/docker-engine/install/on-linux-distributions/</li>
-<li>Mac http://docker.crank.ru/docs/docker-engine/install/installation-on-mac-os-x/</li>
-</ul>
-<h3>Add user to docker group</h3>
+<strong>Vocabulary</strong>
 
-This allow you run docker and docker-compose without sudo
+<strong>Participant:</strong> The end user of the application, the individual who's actions are being recorded in the experiment.
 
-<ul>
-<li>sudo usermod -aG docker $USER</li>
-</ul>
+<strong>Allocation:</strong>  The set of configurations that have been given to the participant, the values that are being experimented against.
 
-<h3>Easy local setup</h3>
-<ul>
-  <li><code>git clone https://github.com/evolv-ai/php-sdk.git</code></li>
-  <li><code>cd php-sdk </code></li>
-  <li><code>run docker-compose up -d</code></li>
-  <li>Open http://localhost:8000/</li>
-</ul>
+<h3>Installation</h3>
+
+Install Lodash-PHP through composer:
+
+<code>https://packagist.org/packages/sdk-php/evolv-sdk</code>
+
+<h3>Usage</h3>
+
+<code>
+  <?php
+
+declare (strict_types=1);
+
+use  App\EvolvClient;
+
+require_once __DIR__ . '/App/EvolvClient.php';
+
+require 'vendor/autoload.php';
+
+$client = new EvolvClient($environment, $uid, $endpoint);
+
+</code>
