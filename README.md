@@ -8,7 +8,7 @@
 
 <h2>Installation</h2>
 
-Install Lodash-PHP through composer:
+Install Evolv Php Sdk through composer:
 
 <code>https://packagist.org/packages/sdk-php/evolv-sdk</code>
 
