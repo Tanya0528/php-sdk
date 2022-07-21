@@ -30,6 +30,7 @@ class EvolvClient
     private $store;
     private bool $autoconfirm;
     private Beacon $contextBeacon;
+    private Beacon $eventBeacon;
 
     public function __construct(string $environment, string $endpoint = 'https://participants.evolv.ai/', bool $autoconfirm = true)
     {
@@ -37,6 +38,7 @@ class EvolvClient
         $this->store = new Store($environment, $endpoint);
         
         $this->contextBeacon = new Beacon($endpoint . 'v1/' . $environment . '/data', $this->context);
+        $this->eventBeacon = new Beacon($endpoint . 'v1/' . $environment . '/events', $this->context);
         
         $this->autoconfirm = $autoconfirm;
     }
@@ -119,6 +121,23 @@ class EvolvClient
     public function on(string $topic, callable $listener)
     {
         waitFor($topic, $listener);
+    }
+
+    /**
+     * Send an event to the events endpoint.
+     *
+     * @param {String} type The type associated with the event.
+     * @param metadata {Object} Any metadata to attach to the event.
+     * @param flush {Boolean} If true, the event will be sent immediately.
+     */
+    public function emit(string $type, $metadata, bool $flush = false)
+    {
+        $this->context->pushToArray('events', ['type' => $type, 'timestamp' => time()]);
+        $this->eventBeacon->emit($type, [
+            'uid' => $this->context->uid,
+            'metadata' => $metadata
+        ], $flush);
+        emit(EvolvClient::EVENT_EMITTED, $type, $metadata);
     }
 
     /**
