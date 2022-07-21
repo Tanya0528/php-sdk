@@ -8,7 +8,9 @@
 
 <h2>Installation</h2>
 
-Install Php-Sdk through composer:
+1.Install composer
+
+2.Install Php-Sdk through composer:
 
 <code>https://packagist.org/packages/sdk-php/evolv-sdk</code>
 
