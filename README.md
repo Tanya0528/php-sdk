@@ -33,7 +33,8 @@
 ```php
   <?php
 
-  $client = new EvolvClient($environment, $uid, $endpoint);
+  $client = new EvolvClient($environment, $endpoint);
+  $client->initialize($uid);
 ```
 
 <h2>About Evolv and the Ascend Product</h2>
