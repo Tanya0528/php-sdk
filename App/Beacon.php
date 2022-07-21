@@ -1,9 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App;
 
-use App\Context;
+use App\EvolvContext;
 
 require 'vendor/autoload.php';
 require_once __DIR__ . '/EvolvStore.php';
@@ -13,11 +14,11 @@ const ENDPOINT_PATTERN = "/\/(v\d+)\/\w+\/([a-z]+)$/i";
 
 class Beacon {
     private string $endpoint;
-    private Context $context;
+    private EvolvContext $context;
     private array $messages = [];
     private bool $v1Events;
 
-    public function __construct(string $endpoint, Context $context)
+    public function __construct(string $endpoint, EvolvContext $context)
     {
         $this->endpoint = $endpoint;
         $this->context = $context;

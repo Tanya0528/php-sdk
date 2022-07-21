@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\filter;
+use function App\Utils\filter;
 
-require_once __DIR__ . '/../../Utils/filter.php';
+require_once __DIR__ . '/../../App/Utils/filter.php';
 
 
 class FilterTest extends TestCase {

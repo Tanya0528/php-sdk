@@ -1,9 +1,6 @@
 <?php
 
-namespace Utils;
-
-use function Utils\prune;
-use function Utils\expand;
+namespace App\Utils;
 
 require_once __DIR__ . '/prune.php';
 require_once __DIR__ . '/expand.php';

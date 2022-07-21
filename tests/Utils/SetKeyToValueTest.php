@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\setKeyToValue;
+use function App\Utils\setKeyToValue;
 
-require_once __DIR__ . '/../../Utils/setKeyToValue.php';
+require_once __DIR__ . '/../../App/Utils/setKeyToValue.php';
 
 
 class SetKeyToValueTest extends TestCase {

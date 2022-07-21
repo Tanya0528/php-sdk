@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 function set_key_recursive(string $k, array $keys, $value, array &$array)
 {

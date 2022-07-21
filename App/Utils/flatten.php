@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 function flatten_recursive(array $current, string $parentKey) {
     $items = [];

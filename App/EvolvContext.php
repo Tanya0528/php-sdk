@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App;
 
-use function Utils\getValueForKey;
-use function Utils\setKeyToValue;
-use function Utils\removeValueForKey;
-use function Utils\emit;
-use function Utils\flatten;
-require_once __DIR__ . '/../Utils/getValueForKey.php';
-require_once __DIR__ . '/../Utils/setKeyToValue.php';
-require_once __DIR__ . '/../Utils/removeValueForKey.php';
-require_once __DIR__ . '/../Utils/waitForIt.php';
-require_once __DIR__ . '/../Utils/flatten.php';
+use function App\Utils\getValueForKey;
+use function App\Utils\setKeyToValue;
+use function App\Utils\removeValueForKey;
+use function App\Utils\emit;
+use function App\Utils\flatten;
+require_once __DIR__ . '/Utils/getValueForKey.php';
+require_once __DIR__ . '/Utils/setKeyToValue.php';
+require_once __DIR__ . '/Utils/removeValueForKey.php';
+require_once __DIR__ . '/Utils/waitForIt.php';
+require_once __DIR__ . '/Utils/flatten.php';
 
 
 const CONTEXT_CHANGED = 'context.changed';
@@ -25,7 +25,7 @@ const CONTEXT_DESTROYED = 'context.destroyed';
 
 const DEFAULT_QUEUE_LIMIT = 50;
 
-class Context
+class EvolvContext
 {
     public string $uid;
     public array $remoteContext = [];

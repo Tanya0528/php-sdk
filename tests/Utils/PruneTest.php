@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\prune;
+use function App\Utils\prune;
 
-require_once __DIR__ . '/../../Utils/prune.php';
+require_once __DIR__ . '/../../App/Utils/prune.php';
 
 
 class PruneTest extends TestCase {

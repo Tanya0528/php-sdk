@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 function getValueForKey(string $key, array $array) {
     $value = null;

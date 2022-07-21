@@ -1,9 +1,12 @@
 <?php
 
-namespace App;
-use function Utils\getValueForKey;
+declare(strict_types=1);
 
-require_once __DIR__ . '/../Utils/getValueForKey.php';
+namespace App;
+
+use function App\Utils\getValueForKey;
+
+require_once __DIR__ . '/../App/Utils/getValueForKey.php';
 
 function regexFromString($string)
 {

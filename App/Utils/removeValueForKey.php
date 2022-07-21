@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 function remove_key_recursive(string $key, array $keys, array &$array)
 {

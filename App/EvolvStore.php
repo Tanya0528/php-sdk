@@ -1,26 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
-use App\Context;
+use App\EvolvContext;
 use App\Predicate;
-use HttpClient;
+use App\HttpClient;
 
-use function Utils\waitFor;
-use function Utils\emit;
-use function Utils\flattenKeys;
-use function Utils\filter;
-use function Utils\getValueForKey;
-use function Utils\prune;
+use function App\Utils\waitFor;
+use function App\Utils\emit;
+use function App\Utils\flattenKeys;
+use function App\Utils\filter;
+use function App\Utils\getValueForKey;
+use function App\Utils\prune;
 
-require_once __DIR__ . '/EvolvOptions.php';
 require_once __DIR__ . '/EvolvContext.php';
-require_once __DIR__ . '/EvolvPredicate.php';
-require_once __DIR__ . '/../Utils/flattenKeys.php';
-require_once __DIR__ . '/../Utils/filter.php';
-require_once __DIR__ . '/../Utils/prune.php';
-require_once __DIR__ . '/../Utils/getValueForKey.php';
-require_once __DIR__ . '/../Utils/waitForIt.php';
+require_once __DIR__ . '/Predicate.php';
+require_once __DIR__ . '/HttpClient.php';
+require_once __DIR__ . '/Utils/flattenKeys.php';
+require_once __DIR__ . '/Utils/filter.php';
+require_once __DIR__ . '/Utils/prune.php';
+require_once __DIR__ . '/Utils/getValueForKey.php';
+require_once __DIR__ . '/Utils/waitForIt.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -58,13 +60,13 @@ function array_some(array $array, callable $filter) {
     return false;
 }
 
-class Store
+class EvolvStore
 {
-    private $httpClient;
+    private HttpClient $httpClient;
     private bool $initialized = false;
     private string $environment;
     private string $endpoint;
-    private Context $context;
+    private EvolvContext $context;
     private Predicate $predicate;
 
     public $config = null;
@@ -291,7 +293,7 @@ class Store
         $this->reevaluatingContext = false;
     }
 
-    public function initialize(Context $context)
+    public function initialize(EvolvContext $context)
     {
         if ($this->initialized) {
             throw new \Exception('Evolv: The store has already been initialized.');
@@ -355,10 +357,6 @@ class Store
         $exclusions = [];
 
         $this->allocations = $value;
-
-        // echo 'UPDATE GENOME';
-
-        // display($this->allocations, 'Allocations');
 
         $this->genomeFailed = false;
 

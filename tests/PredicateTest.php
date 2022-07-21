@@ -3,7 +3,8 @@
 use PHPUnit\Framework\TestCase;
 
 use App\Predicate;
-require_once __DIR__ . '/../App/EvolvPredicate.php';
+
+require_once __DIR__ . '/../App/Predicate.php';
 
 
 class PredicateTest extends TestCase {

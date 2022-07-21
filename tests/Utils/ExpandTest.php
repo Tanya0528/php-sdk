@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\expand;
+use function App\Utils\expand;
 
-require_once __DIR__ . '/../../Utils/expand.php';
+require_once __DIR__ . '/../../App/Utils/expand.php';
 
 
 class ExpandTest extends TestCase {

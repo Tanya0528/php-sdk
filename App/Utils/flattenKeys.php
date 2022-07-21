@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 function flatten_keys_recursive(array $current, $parentKey, callable $filter)
 {

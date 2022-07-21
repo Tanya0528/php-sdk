@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App;
 
-use function Utils\waitFor;
-use function Utils\emit;
+use App\EvolvContext;
+use App\EvolvStore;
+use App\Beacon;
+
+use function App\Utils\waitFor;
+use function App\Utils\emit;
 
 require 'vendor/autoload.php';
 require_once __DIR__ . '/EvolvStore.php';
 require_once __DIR__ . '/Beacon.php';
-require_once __DIR__ . '/../Utils/waitForIt.php';
-
-ini_set('display_errors', 'on');
+require_once __DIR__ . '/Utils/waitForIt.php';
 
 class EvolvClient
 {
@@ -22,7 +24,7 @@ class EvolvClient
     const EVENT_EMITTED = 'event.emitted';
 
     public bool $initialized = false;
-    public $context;
+    public EvolvContext $context;
     private $store;
     private bool $autoconfirm;
     private Beacon $contextBeacon;
@@ -30,8 +32,8 @@ class EvolvClient
 
     public function __construct(string $environment, string $endpoint = 'https://participants.evolv.ai/', bool $autoconfirm = true)
     {
-        $this->context = new Context();
-        $this->store = new Store($environment, $endpoint);
+        $this->context = new EvolvContext();
+        $this->store = new EvolvStore($environment, $endpoint);
         
         $this->contextBeacon = new Beacon($endpoint . 'v1/' . $environment . '/data', $this->context);
         $this->eventBeacon = new Beacon($endpoint . 'v1/' . $environment . '/events', $this->context);

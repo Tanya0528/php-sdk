@@ -1,8 +1,6 @@
 <?php
 
-namespace Utils;
-
-use function Utils\setKeyToValue;
+namespace App\Utils;
 
 require_once __DIR__ . '/setKeyToValue.php';
 

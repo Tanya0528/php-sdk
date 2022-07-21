@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\getValueForKey;
+use function App\Utils\getValueForKey;
 
-require_once __DIR__ . '/../../Utils/getValueForKey.php';
+require_once __DIR__ . '/../../App/Utils/getValueForKey.php';
 
 
 class GetValueForKeyTest extends TestCase {

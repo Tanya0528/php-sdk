@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\flatten;
+use function App\Utils\flatten;
 
-require_once __DIR__ . '/../../Utils/flatten.php';
+require_once __DIR__ . '/../../App/Utils/flatten.php';
 
 
 class FlattenTest extends TestCase {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace App\Utils;
 
 $scopedHandlers = [];
 
@@ -19,7 +19,6 @@ function waitFor(string $it, callable $handler)
 {
     global $scopedHandlers;
 
-    
     ensureScope($it);
   
     $scopedHandlers[$it][] = $handler;

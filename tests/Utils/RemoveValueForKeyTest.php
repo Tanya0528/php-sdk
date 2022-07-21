@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function Utils\removeValueForKey;
+use function App\Utils\removeValueForKey;
 
-require_once __DIR__ . '/../../Utils/removeValueForKey.php';
+require_once __DIR__ . '/../../App/Utils/removeValueForKey.php';
 
 
 class RemoveValueForKeyTest extends TestCase {
