@@ -63,9 +63,6 @@ class Store
     private Context $context;
     private Predicate $predicate;
 
-
-
-
     public $config = null;
     public $allocations = null;
     private $configFailed = false;
@@ -297,10 +294,8 @@ class Store
 
         $this->pull();
 
-        waitFor(CONTEXT_CHANGED, function($key, $updated) {
-            // display($updated, $key);
-            // $this->reevaluateContext();
-            // display($this->context->remoteContext, 'WAITFORIT');
+        waitFor(CONTEXT_CHANGED, function() {
+            $this->reevaluateContext();
         });
     }
 

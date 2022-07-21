@@ -79,16 +79,10 @@ function display($arr, $title = null)
                         //     display("CONTEXT_VALUE_CHANGED. KEY: $key, VALUE: $value");
                         // });
 
-                        $client->initialize($uid, [
-                            'native' => [
-                                'newUser' => true,
-                                'pageCategory' => 'pdp'
-                            ],
-                            'extra_key' => true
-                        ]);
+                        $client->initialize($uid);
 
-                        // $client->context->set('native.newUser', true);
-                        // $client->context->set('native.pageCategory', 'home');
+                        $client->context->set('native.newUser', true);
+                        $client->context->set('native.pageCategory', 'home');
                         // $client->context->set('native.pageCategory', 'pdp');
 
                         // display($client->context->remoteContext, 'CONTEXT')
