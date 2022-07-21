@@ -81,12 +81,18 @@ function display($arr, $title = null)
 
                         $client->initialize($uid);
 
-                        $client->context->set('native.newUser', true);
-                        $client->context->set('native.pageCategory', 'home');
+
                         // $client->context->set('native.pageCategory', 'pdp');
 
                         // display($client->context->remoteContext, 'CONTEXT')
 
+                        $client->getActiveKeys('', function($keys) {
+                            display($keys, 'Active Keys');
+                        });
+                        
+                        $client->context->set('native.newUser', true);
+                        $client->context->set('native.pageCategory', 'home');
+                        $client->context->set('native.pageCategory', 'pdp');
                     ?>
                     </div>
                 </div>

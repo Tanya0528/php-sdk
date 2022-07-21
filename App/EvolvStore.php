@@ -65,6 +65,7 @@ class Store
 
     public $config = null;
     public $allocations = null;
+    public $effectiveGenome = null;
     private $configFailed = false;
     private $genomeFailed = false;
     private $genomes = [];
@@ -255,8 +256,8 @@ class Store
         $this->setActiveAndEntryKeyStates();
         $result = $this->generateEffectiveGenome($this->configKeyStates['experiments'], $this->genomes);
 
-        $effectiveGenome = $result['effectiveGenome'];
-        $activeEids = $result['activeEids'];
+        $this->effectiveGenome = $result['effectiveGenome'];
+        $this->activeEids = $result['activeEids'];
 
         $this->activeKeys = [];
         $this->activeVariants = [];
@@ -267,7 +268,7 @@ class Store
                 foreach($active as $key) {
                     $this->activeKeys[] = $key;
                 }
-                $pruned = prune($effectiveGenome, $active);
+                $pruned = prune($this->effectiveGenome, $active);
                 foreach($pruned as $key => $value) {
                     $this->activeVariants[] = $key . ':' . 'hashCode';
                 }
@@ -281,6 +282,10 @@ class Store
         display($this->context->remoteContext, 'REEVALUATE:');
 
         $this->reevaluatingContext = false;
+
+        foreach($this->subscriptions as $listener) {
+            $listener($this->effectiveGenome, $this->config);
+        }
     }
 
     public function initialize(Context $context)
@@ -390,7 +395,6 @@ class Store
 
     private function update($config, $allocation)
     {
-
         $this->updateConfig($config);
         $this->updateGenome($allocation);
 
@@ -423,8 +427,26 @@ class Store
         $this->update($arr_config, $arr_location);
     }
 
+    public function getActiveKeys(string $prefix = null)
+    {
+        return array_filter($this->activeKeys, function($key) use ($prefix) {
+            return !$prefix || startsWith($key, $prefix);
+        });
+    }
+
     public function activeEntryPoints()
     {
         return [];
+    }
+
+    public function createSubscribable(string $functionName, $key, callable $listener = null)
+    {
+        if (isset($listener)) {
+            $this->subscriptions[] = function($effectiveGenome, $config) use ($listener, $functionName, $key) {
+                $listener(call_user_func_array([$this, $functionName], [$key, $effectiveGenome, $config]));
+            };
+        } else {
+            return call_user_func_array([$this, $functionName], [$key, $this->effectiveGenome, $this->config]);
+        }
     }
 }

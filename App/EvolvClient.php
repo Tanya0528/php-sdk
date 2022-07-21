@@ -129,9 +129,9 @@ class EvolvClient
      * describing the state of active keys.
      * @method
      */
-    public function getActiveKeys(string $prefix = '')
+    public function getActiveKeys(string $prefix = '', callable $listener = null)
     {
-        // return $this->store->getActiveKeys($prefix);
+        return $this->store->createSubscribable('getActiveKeys', $prefix, $listener);
     }
 
     /**
