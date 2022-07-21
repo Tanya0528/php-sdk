@@ -89,6 +89,10 @@ function display($arr, $title = null)
                         $client->getActiveKeys('', function($keys) {
                             display($keys, 'Active Keys');
                         });
+
+                        $client->get('pdp.page_layout', function($key) {
+                            display($key, 'pdp');
+                        });
                         
                         $client->context->set('native.newUser', true);
                         $client->context->set('native.pageCategory', 'home');

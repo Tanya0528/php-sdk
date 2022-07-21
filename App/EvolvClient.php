@@ -135,6 +135,18 @@ class EvolvClient
     }
 
     /**
+     * Get the value of a specified key.
+     *
+     * @param {String} key The key of the value to retrieve.
+     * @returns @mixed A value of the specified key.
+     * @method
+     */
+    public function get(string $key = '', callable $listener = null)
+    {
+        return $this->store->createSubscribable('getValue', $key, $listener);
+    }
+
+    /**
      * Confirm that the consumer has successfully received and applied values, making them eligible for inclusion in
      * optimization statistics.
      */

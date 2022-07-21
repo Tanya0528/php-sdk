@@ -9,6 +9,7 @@ use HttpClient;
 use function Utils\waitFor;
 use function Utils\flattenKeys;
 use function Utils\filter;
+use function Utils\getValueForKey;
 use function Utils\prune;
 
 require_once __DIR__ . '/EvolvOptions.php';
@@ -17,6 +18,7 @@ require_once __DIR__ . '/EvolvPredicate.php';
 require_once __DIR__ . '/../Utils/flattenKeys.php';
 require_once __DIR__ . '/../Utils/filter.php';
 require_once __DIR__ . '/../Utils/prune.php';
+require_once __DIR__ . '/../Utils/getValueForKey.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -433,6 +435,10 @@ class Store
             return !$prefix || startsWith($key, $prefix);
         });
     }
+
+    public function getValue(string $key, $effectiveGenome) {
+        return getValueForKey($key, $effectiveGenome);
+    } 
 
     public function activeEntryPoints()
     {
