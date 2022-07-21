@@ -26,5 +26,5 @@ Install Lodash-PHP through composer:
   require 'vendor/autoload.php';
 
   $client = new EvolvClient($environment, $uid, $endpoint);
-  ?>
+
 </code>
