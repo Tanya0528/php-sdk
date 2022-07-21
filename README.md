@@ -6,25 +6,27 @@
 
 <strong>Allocation:</strong>  The set of configurations that have been given to the participant, the values that are being experimented against.
 
-<h3>Installation</h3>
+<h2>Installation</h2>
+<hr>
 
 Install Lodash-PHP through composer:
 
 <code>https://packagist.org/packages/sdk-php/evolv-sdk</code>
 
-<h3>Usage</h3>
+<h2>Usage</h2>
+<hr>
 
 <code>
   <?php
 
-declare (strict_types=1);
+  adeclare (strict_types=1);
 
-use  App\EvolvClient;
+  use  App\EvolvClient;
 
-require_once __DIR__ . '/App/EvolvClient.php';
+  require_once __DIR__ . '/App/EvolvClient.php';
 
-require 'vendor/autoload.php';
+  require 'vendor/autoload.php';
 
-$client = new EvolvClient($environment, $uid, $endpoint);
-
+  $client = new EvolvClient($environment, $uid, $endpoint);
+  ?>
 </code>
