@@ -90,4 +90,8 @@ class Beacon {
 
         $this->transmit();
     }
+
+    public function flush() {
+        $this->transmit();
+    }
 } 

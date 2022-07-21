@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App;
 
-// use const App\CONTEXT_INITIALIZED;
-// use const App\CONTEXT_VALUE_ADDED;
-// use const App\CONTEXT_VALUE_CHANGED;
-
 use function Utils\waitFor;
 use function Utils\emit;
 
@@ -68,6 +64,8 @@ class EvolvClient
         if ($this->autoconfirm) {
             $this->confirm();
         }
+
+        $this->initialized = true;
 
         waitFor(CONTEXT_INITIALIZED, function($type, $ctx) {
             $this->contextBeacon->emit($type, $this->context->remoteContext);
@@ -171,52 +169,56 @@ class EvolvClient
      */
     public function confirm()
     {
-        $allocations = $this->context->get('experiments.allocations');
-        if (!isset($allocations) || !count($allocations)) {
-            return;
-        }
+        waitFor(EFFECTIVE_GENOME_UPDATED, function() {
+            $allocations = $this->context->get('experiments.allocations');
+            if (!isset($allocations) || !count($allocations)) {
+                return;
+            }
 
-        $entryPointEids = $this->store->activeEntryPoints();
-        if (!count($entryPointEids)) {
-            return;
-        }
-    
-        $confirmations = $this->context->get('experiments.confirmations');
-        $confirmedCids = array_map(function($item) { return $item['cid']; }, $confirmations) ?? [];
-    
-        $contaminations = $this->context->get('experiments.contaminations');
-        $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations) ?? [];
+            $entryPointEids = $this->store->activeEntryPoints();
+            if (!count($entryPointEids)) {
+                return;
+            }
 
-        $confirmableAllocations = array_filter($allocations, function($alloc) use ($confirmedCids, $contaminatedCids, $entryPointEids) {
-            return !array_search($alloc['cid'], $confirmedCids) &&
-                !array_search($alloc['cid'], $contaminatedCids) &&
-                array_search($alloc['eid'], $this->store->activeEids) &&
-                array_search($alloc['eid'], $entryPointEids);
+            $confirmations = $this->context->get('experiments.confirmations') ?? [];
+            $confirmedCids = array_map(function($item) { return $item['cid']; }, $confirmations);
+
+            $contaminations = $this->context->get('experiments.contaminations') ?? [];
+            $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations);
+
+            $confirmableAllocations = array_filter($allocations, function($alloc) use ($confirmedCids, $contaminatedCids, $entryPointEids) {
+                return !in_array($alloc['cid'], $confirmedCids) &&
+                    !in_array($alloc['cid'], $contaminatedCids) &&
+                    in_array($alloc['eid'], $this->store->activeEids) &&
+                    in_array($alloc['eid'], $entryPointEids);
+            });
+            if (!count($confirmableAllocations)) {
+                return;
+            }
+
+            $timestamp = time();
+
+            $contextConfirmations = array_map(function($alloc) use ($timestamp) {
+                return [
+                    'cid' => $alloc['cid'],
+                    'timestamp' => $timestamp
+                ];
+            }, $confirmableAllocations);
+
+            $newConfirmations = array_merge($contextConfirmations, $confirmations);
+            $this->context->update(['experiments' => ['confirmations' => $newConfirmations]]);
+
+            foreach ($confirmableAllocations as $alloc) {
+                $this->eventBeacon->emit('confirmation', array_merge([
+                    'uid' => $alloc['uid'],
+                    'eid' => $alloc['eid'],
+                    'cid' => $alloc['cid']
+                ], $this->context->remoteContext));
+            };
+
+            $this->eventBeacon->flush();
+            emit(EvolvClient::CONFIRMED);
         });
-        if (!count($confirmableAllocations)) {
-            return;
-        }
-
-        $timestamp = time();
-
-        $contextConfirmations = array_map(function($alloc) use ($timestamp) {
-            return ['cid' => $alloc['cid'], 'timestamp' => $timestamp];
-        }, $confirmableAllocations);
-
-        $newConfirmations = array_merge($contextConfirmations, $confirmations);
-        $this->context->update(['experiments' => ['confirmations' => $newConfirmations]]);
-
-        foreach ($confirmableAllocations as $alloc) {
-            // TODO: emit confirmation event
-            // eventBeacon.emit('confirmation', assign({
-            //     uid: alloc.uid,
-            //     sid: alloc.sid,
-            //     eid: alloc.eid,
-            //     cid: alloc.cid
-            //   }, context.remoteContext));
-        };
-    
-        // TODO: emit EvolvClient.CONFIRMED event
     }
 
     /**
@@ -239,14 +241,13 @@ class EvolvClient
             throw new \Exception('Evolv: contamination details must include a reason');
         }
 
-        $contaminations = $this->context->get('experiments.contaminations');
-        $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations) ?? [];
+        $contaminations = $this->context->get('experiments.contaminations') ?? [];
+        $contaminatedCids = array_map(function($item) { return $item['cid']; }, $contaminations);
 
         $contaminatableAllocations = array_filter($allocations, function($alloc) use ($contaminatedCids, $allExperiments) {
-            return !array_search($alloc['cid'], $contaminatedCids) &&
-                ($allExperiments || array_search($alloc['eid'], $this->store->activeEids));
+            return !in_array($alloc['cid'], $contaminatedCids) &&
+                ($allExperiments || in_array($alloc['eid'], $this->store->activeEids));
         });
-
         if (!count($contaminatableAllocations)) {
             return;
         }
@@ -254,24 +255,26 @@ class EvolvClient
         $timestamp = time();
 
         $contextContaminations = array_map(function($alloc) use ($timestamp) {
-            return ['cid' => $alloc['cid'], 'timestamp' => $timestamp];
+            return [
+                'cid' => $alloc['cid'],
+                'timestamp' => $timestamp
+            ];
         }, $contaminatableAllocations);
 
         $newContaminations = array_merge($contextContaminations, $contaminations);
         $this->context->update(['experiments' => ['contaminations' => $newContaminations]]);
 
         foreach ($contaminatableAllocations as $alloc) {
-            // TODO: emit contamination events
-            // eventBeacon.emit('contamination', assign({
-            //     uid: alloc.uid,
-            //     sid: alloc.sid,
-            //     eid: alloc.eid,
-            //     cid: alloc.cid,
-            //     contaminationReason: details
-            //   }, context.remoteContext));
+            $this->eventBeacon->emit('contamination', array_merge([
+                'uid' => $alloc['uid'],
+                'eid' => $alloc['eid'],
+                'cid' => $alloc['cid'],
+                'contaminationReason' => $details
+            ], $this->context->remoteContext));
         };
     
-        // TODO: emit EvolvClient.CONTAMINATED event
+        $this->eventBeacon->flush();
+        emit(EvolvClient::CONTAMINATED);
     }
 }
 

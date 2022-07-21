@@ -82,21 +82,27 @@ function display($arr, $title = null)
                         $client->initialize($uid);
 
 
+                        $client->on('confirmed', function() use ($client) {
+                            display('CONFIRMED');
+                            $client->contaminate(['reason' => 'no special reason']);
+                        });
+
+
                         // $client->context->set('native.pageCategory', 'pdp');
 
                         // display($client->context->remoteContext, 'CONTEXT')
 
-                        $client->getActiveKeys('', function($keys) {
-                            display($keys, 'Active Keys');
-                        });
+                        // $client->getActiveKeys('', function($keys) {
+                        //     display($keys, 'Active Keys');
+                        // });
 
-                        $client->get('pdp.page_layout', function($key) {
-                            display($key, 'pdp');
-                        });
+                        // $client->get('pdp.page_layout', function($key) {
+                        //     display($key, 'pdp');
+                        // });
                         
                         $client->context->set('native.newUser', true);
                         $client->context->set('native.pageCategory', 'home');
-                        $client->context->set('native.pageCategory', 'pdp');
+
                     ?>
                     </div>
                 </div>

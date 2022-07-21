@@ -7,6 +7,7 @@ use App\Predicate;
 use HttpClient;
 
 use function Utils\waitFor;
+use function Utils\emit;
 use function Utils\flattenKeys;
 use function Utils\filter;
 use function Utils\getValueForKey;
@@ -19,6 +20,7 @@ require_once __DIR__ . '/../Utils/flattenKeys.php';
 require_once __DIR__ . '/../Utils/filter.php';
 require_once __DIR__ . '/../Utils/prune.php';
 require_once __DIR__ . '/../Utils/getValueForKey.php';
+require_once __DIR__ . '/../Utils/waitForIt.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -280,14 +282,13 @@ class Store
         $this->context->set('keys.active', $this->activeKeys);
         $this->context->set('variants.active', $this->activeVariants);
 
-        // display($this->activeKeys, 'Active Keys:');
-        display($this->context->remoteContext, 'REEVALUATE:');
-
-        $this->reevaluatingContext = false;
+        emit(EFFECTIVE_GENOME_UPDATED, $this->effectiveGenome);
 
         foreach($this->subscriptions as $listener) {
             $listener($this->effectiveGenome, $this->config);
         }
+
+        $this->reevaluatingContext = false;
     }
 
     public function initialize(Context $context)
@@ -442,7 +443,16 @@ class Store
 
     public function activeEntryPoints()
     {
-        return [];
+        $eids = [];
+
+        foreach($this->configKeyStates['experiments'] as $eid => $expKeyStates) {
+            $entry = $expKeyStates['entry'];
+            if ($entry && count($entry)) {
+                $eids[] = $eid;
+            }
+        }
+
+        return $eids;
     }
 
     public function createSubscribable(string $functionName, $key, callable $listener = null)
