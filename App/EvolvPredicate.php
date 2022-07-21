@@ -34,12 +34,12 @@ class Predicate
             'contains' => function ($a, $b) { return in_array($a, $b); },
             'defined' => function ($a, $b) { return (isset($a) && !empty($a)) ? true : false; },
             'equal' => function ($a, $b) { return $a === $b; },
-            'exists' => function ($a, $b) { return (!empty($a) && isset($a)) ? true : false; },
+            'exists' => function ($a, $b) { return $a !== null; },
             'greater_than' => function ($a, $b) { return ($a > $b) ? true : false; },
             'greater_than_or_equal_to' => function ($a, $b) { ($a >= $b) ? true : false; },
-            'is_true' => function ($a, $b) { return $a === true ? true : false; },
-            'is_false' => function ($a, $b) { return $a === false ? true : false; },
-            'not_exists' => function ($a, $b) { return (empty($a)) ? true : false; },
+            'is_true' => function ($a, $b) { return $a === true; },
+            'is_false' => function ($a, $b) { return $a === false; },
+            'not_exists' => function ($a, $b) { return $a === null; },
             'not_contains' => function ($a, $b) { return !in_array($a, $b); },
             'not_defined' => function ($a, $b) { return (isset($a) == false && empty($a)) ? true : false; },
             'not_equal' => function ($a, $b) { return ($a !== $b) ? true : false; },
@@ -52,8 +52,8 @@ class Predicate
             'kv_not_equal' => function ($obj, $params) { return $obj[$params[0]] !== $params[1]; },
             'less_than' => function ($a, $b) { return $a < $b; },
             'less_than_or_equal_to' => function ($a, $b) { return $a <= $b; },
-            'loose_equal' => function ($a, $b) { return $a == $b ? true : false; },
-            'loose_not_equal' => function ($a, $b) { return $a != $b ? true : false; },
+            'loose_equal' => function ($a, $b) { return $a == $b; },
+            'loose_not_equal' => function ($a, $b) { return $a != $b; },
             'regex_match' => function ($a, $b) { return $a != $b ? true : false; },
             'regex64_match' => function ($value, $pattern) { return regex64Match($value, $pattern); },
             'starts_with' => function ($a, $b) { return strpos($a, $b) === 0; }
@@ -63,7 +63,7 @@ class Predicate
     private function evaluateFilter($context, $rule): bool {
         $value = getValueForKey($rule['field'], $context);
 
-        if (strpos($rule['operator'], 'kv_') && !$value) {
+        if (strpos($rule['operator'], 'kv_') === 0 && !$value) {
             return false;
         }
 

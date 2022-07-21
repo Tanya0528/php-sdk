@@ -131,7 +131,7 @@ class EvolvClient
      */
     public function getActiveKeys(string $prefix = '')
     {
-        return $this->store->getActiveKeys($prefix);
+        // return $this->store->getActiveKeys($prefix);
     }
 
     /**

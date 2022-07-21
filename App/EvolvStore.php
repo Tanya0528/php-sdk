@@ -112,15 +112,13 @@ class Store
             }
         }
 
-        if ($config['_is_entry_point']) {
+        if (isset($config['_is_entry_point']) && $config['_is_entry_point'] === true) {
             $entry[] = $prefix;
         }
 
-        foreach(array_keys($config) as $key) {
-            if (startsWith($key, '_')) {
-                return;
-            }
-
+        $keys = array_filter(array_keys($config), function($key) { return !startsWith($key, '_'); });
+    
+        foreach($keys as $key) {
             $this->evaluateBranch($context, $config[$key], $prefix ? ($prefix . '.' . $key) : $key, $disabled, $entry);
         }
     }
@@ -151,7 +149,7 @@ class Store
     {
         $expKeyStates = [
             'active' => [],
-            'entiry' => []
+            'entry' => []
         ];
 
         foreach($keyStatesLoaded as $key) {
@@ -301,8 +299,8 @@ class Store
 
         waitFor(CONTEXT_CHANGED, function($key, $updated) {
             // display($updated, $key);
-            $this->reevaluateContext();
-            display($this->context->remoteContext, 'WAITFORIT');
+            // $this->reevaluateContext();
+            // display($this->context->remoteContext, 'WAITFORIT');
         });
     }
 
@@ -366,7 +364,8 @@ class Store
             unset($clean['genome']);
             unset($clean['audience_query']);
 
-            $allocs[] = $clean['eid'];
+            $allocs[] = $clean;
+
             if ($clean['excluded']) {
                 $exclusions[] = $clean['eid'];
                 return;
@@ -394,20 +393,11 @@ class Store
         }
     }
 
-    private function update(bool $isConfigRequest, $value)
+    private function update($config, $allocation)
     {
-        $keyStates = null;
-        if ($isConfigRequest) {
-            $keyStates = &$this->configKeyStates;
-        } else {
-            $keyStates = &$this->genomeKeyStates;
-        }
 
-        if ($isConfigRequest) {
-            $this->updateConfig($value);
-        } else {
-            $this->updateGenome($value);
-        }
+        $this->updateConfig($config);
+        $this->updateGenome($allocation);
 
         $this->reevaluateContext();
     }
@@ -435,21 +425,7 @@ class Store
             'experiments' => [],
         ];
 
-        $this->update(true, $arr_config);
-        $this->update(false, $arr_location);
-    }
-
-    public function getActiveKeys(string $prefix = '')
-    {
-        $predicate = new Predicate();
-
-        $configKeyStates = $this->configKeyStates;
-
-        $context = $this->context->resolve();
-
-        $keys = $predicate->evaluate($context, $configKeyStates);
-
-        return $keys;
+        $this->update($arr_config, $arr_location);
     }
 
     public function activeEntryPoints()
