@@ -12,21 +12,18 @@
 
 <h2>Install</h2>
 
-```php
-  <?php
+```phpa
   composer install
 ```
 <h2>Documentation Build</h2>
 
 ```php
-  <?php
   composer docs
 ```
 
 <h2>Tests Build</h2>
 
 ```php
-  <?php
   composer test
 ```
 
