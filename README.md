@@ -10,7 +10,7 @@
 
 <code>https://packagist.org/packages/sdk-php/evolv-sdk</code>
 
-<h2>If you use docker:</h2>
+<h1>If you use Docker:</h1>
 
 <h2>Install</h2>
 
@@ -34,7 +34,7 @@
 ```php
   composer test
 ```
-<h2>If you use OpenServer, Denwer, Xammp:</h2>
+<h1>If you use OpenServer, Denwer, Xammp:</h1>
 
 <h2>Install</h2>
 
